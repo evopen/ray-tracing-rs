@@ -8,6 +8,7 @@ edition = "2018"
 [dependencies]
 image = { version = "0.23", default-features = false, features = ["png"] }
 glam = "0.17"
+rand = { version = "0.8", features = ["small_rng"] }
 
 [profile.dev.package."*"]
 opt-level = 3

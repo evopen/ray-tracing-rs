@@ -5,6 +5,7 @@ mod hittable;
 mod hittable_list;
 mod ray;
 mod sphere;
+mod utils;
 mod vec3;
 
 use std::rc::Rc;

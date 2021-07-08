@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::hittable::{HitRecord, Hittable};
 
-struct HittableList {
+pub struct HittableList {
     objects: Vec<Rc<dyn Hittable>>,
 }
 
@@ -10,8 +10,8 @@ impl HittableList {
     pub fn new() -> Self {
         Self { objects: vec![] }
     }
-    pub fn add(&mut self, object: &Rc<dyn Hittable>) {
-        self.objects.push(object.clone());
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+        self.objects.push(object);
     }
 
     pub fn clear(&mut self) {

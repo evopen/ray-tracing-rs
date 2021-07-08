@@ -1,6 +1,6 @@
 use crate::vec3::Point3;
 
-struct Sphere {
+pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
 }

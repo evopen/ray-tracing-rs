@@ -1,8 +1,10 @@
 // based on ray tracing in one weekend 3.2.3
 
 mod color;
+mod hittable;
 mod ray;
 mod vec3;
+mod sphere;
 
 use color::Color;
 use ray::Ray;

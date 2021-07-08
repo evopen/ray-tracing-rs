@@ -14,9 +14,9 @@ pub fn write_color(
     let mut b = color.z;
 
     let scale = 1.0 / samples_per_pixel as f64;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    r = (scale * r).sqrt();
+    g = (scale * g).sqrt();
+    b = (scale * b).sqrt();
     let ir = (256.0 * r.clamp(0.0, 0.999)) as u8;
     let ig = (256.0 * g.clamp(0.0, 0.999)) as u8;
     let ib = (256.0 * b.clamp(0.0, 0.999)) as u8;

@@ -2,9 +2,10 @@
 
 mod color;
 mod hittable;
+mod hittable_list;
 mod ray;
-mod vec3;
 mod sphere;
+mod vec3;
 
 use color::Color;
 use ray::Ray;

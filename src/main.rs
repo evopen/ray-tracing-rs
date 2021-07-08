@@ -21,23 +21,11 @@ use crate::hittable::Hittable;
 use crate::hittable_list::HittableList;
 use crate::sphere::Sphere;
 
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> Option<f64> {
-    let oc = r.origin() - *center;
-    let a = r.direction().length_squared();
-    let half_b = oc.dot(r.direction());
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-    if discriminant < 0.0 {
-        None
-    } else {
-        Some((-half_b - discriminant.sqrt()) / a)
-    }
-}
-
 fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
     let mut rec = HitRecord::default();
     if world.hit(r, 0.0, std::f64::INFINITY, &mut rec) {
-        return 0.5 * (rec.normal + Color::splat(1.0));
+        let target = rec.p + rec.normal + utils::rand_vec3_in_unit_sphere();
+        return 0.5 * ray_color(&Ray::new(&rec.p, &(target - rec.p)), world);
     }
 
     let unit_direction = r.direction().normalize();
@@ -79,8 +67,8 @@ fn main() {
         for x in 0..image_width {
             let mut pixel_color = Color::splat(0.0);
             for _ in 0..samples_per_pixel {
-                let u = (x as f64 + utils::random_f64()) / (image_width - 1) as f64;
-                let v = (y as f64 + utils::random_f64()) / (image_height - 1) as f64;
+                let u = (x as f64 + utils::rand_f64()) / (image_width - 1) as f64;
+                let v = (y as f64 + utils::rand_f64()) / (image_height - 1) as f64;
                 let r = cam.get_ray(u, v);
                 pixel_color += ray_color(&r, &world);
             }

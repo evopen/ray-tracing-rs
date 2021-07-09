@@ -26,8 +26,11 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
         return Color::splat(0.0);
     }
     if let Some(rec) = world.hit(r, 0.001, std::f64::INFINITY) {
-        let scatter = rec.material.scatter(r, &rec).unwrap();
-        return scatter.attenuation * ray_color(&scatter.ray, world, depth - 1);
+        if let Some(scatter) = rec.material.scatter(r, &rec) {
+            return scatter.attenuation * ray_color(&scatter.ray, world, depth - 1);
+        } else {
+            return Color::splat(0.0);
+        }
     }
 
     let unit_direction = r.direction().normalize();
@@ -48,8 +51,8 @@ fn main() {
 
     let material_ground = Rc::new(material::Lambertian::new(&Color::new(0.8, 0.8, 0.0)));
     let material_center = Rc::new(material::Lambertian::new(&Color::new(0.7, 0.3, 0.3)));
-    let material_left = Rc::new(material::Metal::new(&Color::new(0.8, 0.8, 0.8)));
-    let material_right = Rc::new(material::Metal::new(&Color::new(0.8, 0.6, 0.2)));
+    let material_left = Rc::new(material::Metal::new(&Color::new(0.8, 0.8, 0.8), 0.3));
+    let material_right = Rc::new(material::Metal::new(&Color::new(0.8, 0.6, 0.2), 1.0));
 
     world.add(Rc::new(Sphere::new(
         &Vec3::new(0.0, -100.5, -1.0),

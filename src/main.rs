@@ -4,6 +4,7 @@ mod camera;
 mod color;
 mod hittable;
 mod hittable_list;
+mod material;
 mod ray;
 mod sphere;
 mod utils;

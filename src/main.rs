@@ -26,8 +26,7 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
         return Color::splat(0.0);
     }
-    let mut rec = HitRecord::default();
-    if world.hit(r, 0.001, std::f64::INFINITY, &mut rec) {
+    if let Some(rec) = world.hit(r, 0.001, std::f64::INFINITY) {
         let target = rec.p + rec.normal + utils::rand_vec3_unit();
         return 0.5 * ray_color(&Ray::new(&rec.p, &(target - rec.p)), world, depth - 1);
     }

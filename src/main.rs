@@ -17,18 +17,22 @@ use hittable::HitRecord;
 use ray::Ray;
 use vec3::{Point3, Vec3};
 
-use crate::camera::Camera;
-use crate::hittable::Hittable;
-use crate::hittable_list::HittableList;
-use crate::sphere::Sphere;
+use camera::Camera;
+use hittable::Hittable;
+use hittable_list::HittableList;
+use material::Material;
+use sphere::Sphere;
 
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
         return Color::splat(0.0);
     }
     if let Some(rec) = world.hit(r, 0.001, std::f64::INFINITY) {
-        let target = rec.p + rec.normal + utils::rand_vec3_unit();
-        return 0.5 * ray_color(&Ray::new(&rec.p, &(target - rec.p)), world, depth - 1);
+        let mut scattered = Ray::default();
+        let mut attenuation = Color::default();
+        rec.material
+            .scatter(r, &rec, &mut attenuation, &mut scattered);
+        return attenuation * ray_color(&scattered, world, depth - 1);
     }
 
     let unit_direction = r.direction().normalize();
@@ -46,8 +50,32 @@ fn main() {
 
     // World
     let mut world = HittableList::new();
-    world.add(Rc::new(Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Rc::new(Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0)));
+
+    let material_ground = Rc::new(material::Lambertian::new(&Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(material::Lambertian::new(&Color::new(0.7, 0.3, 0.3)));
+    let material_left = Rc::new(material::Metal::new(&Color::new(0.8, 0.8, 0.8)));
+    let material_right = Rc::new(material::Metal::new(&Color::new(0.8, 0.6, 0.2)));
+
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
+    )));
 
     // Camera
     let viewport_height = 2.0;

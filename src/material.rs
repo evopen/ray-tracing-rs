@@ -54,10 +54,14 @@ impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
         let reflected = vec3::reflect(r.direction().normalize(), rec.normal);
         let scattered = Ray::new(rec.p, reflected);
-        assert!(scattered.direction().dot(rec.normal) > 0.0);
-        Some(Scatter {
-            attenuation: self.base_color,
-            ray: scattered,
-        })
+
+        if scattered.direction().dot(rec.normal) < 0.0 {
+            return None;
+        } else {
+            return Some(Scatter {
+                attenuation: self.base_color,
+                ray: scattered,
+            });
+        }
     }
 }

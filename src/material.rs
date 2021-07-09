@@ -18,7 +18,7 @@ impl Material for Lambertian {
         if vec3::is_near_zero(scatter_direction) {
             scatter_direction = rec.normal;
         }
-        *scattered = Ray::new(&rec.p, &scatter_direction);
+        *scattered = Ray::new(rec.p, scatter_direction);
         *attenuation = self.base_color;
     }
 }
@@ -46,7 +46,7 @@ impl Metal {
 impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray) {
         let reflected = vec3::reflect(r.direction().normalize(), rec.normal);
-        *scattered = Ray::new(&rec.p, &reflected);
+        *scattered = Ray::new(rec.p, reflected);
         *attenuation = self.base_color;
         assert!(scattered.direction().dot(rec.normal) > 0.0);
     }

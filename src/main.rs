@@ -13,14 +13,12 @@ mod vec3;
 use std::rc::Rc;
 
 use color::Color;
-use hittable::HitRecord;
 use ray::Ray;
 use vec3::{Point3, Vec3};
 
 use camera::Camera;
 use hittable::Hittable;
 use hittable_list::HittableList;
-use material::Material;
 use sphere::Sphere;
 
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {

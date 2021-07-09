@@ -1,7 +1,7 @@
 use std::cell::RefCell;
 
 use rand::prelude::SmallRng;
-use rand::{Rng, RngCore, SeedableRng};
+use rand::{Rng, SeedableRng};
 
 use crate::Vec3;
 

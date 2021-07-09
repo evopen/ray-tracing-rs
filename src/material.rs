@@ -4,8 +4,13 @@ use crate::ray::Ray;
 use crate::Vec3;
 use crate::{utils, vec3};
 
+pub struct Scatter {
+    pub attenuation: Color,
+    pub ray: Ray,
+}
+
 pub trait Material {
-    fn scatter(&self, r: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray);
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter>;
 }
 
 pub struct Lambertian {
@@ -13,13 +18,15 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, r: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray) {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
         let mut scatter_direction = rec.normal + utils::rand_vec3_unit();
         if vec3::is_near_zero(scatter_direction) {
             scatter_direction = rec.normal;
         }
-        *scattered = Ray::new(rec.p, scatter_direction);
-        *attenuation = self.base_color;
+        Some(Scatter {
+            attenuation: self.base_color,
+            ray: Ray::new(rec.p, scatter_direction),
+        })
     }
 }
 
@@ -44,10 +51,13 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, r: &Ray, rec: &HitRecord, attenuation: &mut Color, scattered: &mut Ray) {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
         let reflected = vec3::reflect(r.direction().normalize(), rec.normal);
-        *scattered = Ray::new(rec.p, reflected);
-        *attenuation = self.base_color;
+        let scattered = Ray::new(rec.p, reflected);
         assert!(scattered.direction().dot(rec.normal) > 0.0);
+        Some(Scatter {
+            attenuation: self.base_color,
+            ray: scattered,
+        })
     }
 }

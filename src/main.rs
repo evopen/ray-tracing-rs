@@ -26,11 +26,8 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
         return Color::splat(0.0);
     }
     if let Some(rec) = world.hit(r, 0.001, std::f64::INFINITY) {
-        let mut scattered = Ray::default();
-        let mut attenuation = Color::default();
-        rec.material
-            .scatter(r, &rec, &mut attenuation, &mut scattered);
-        return attenuation * ray_color(&scattered, world, depth - 1);
+        let scatter = rec.material.scatter(r, &rec).unwrap();
+        return scatter.attenuation * ray_color(&scatter.ray, world, depth - 1);
     }
 
     let unit_direction = r.direction().normalize();

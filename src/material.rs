@@ -77,6 +77,13 @@ impl Dielectric {
     pub fn new(ir: f64) -> Self {
         Self { ir }
     }
+
+    fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+        // Use Schlick's approximation for reflectance.
+        let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+        r0 = r0 * r0;
+        return r0 + (1.0 - r0) * (1.0 - cosine).powi(5);
+    }
 }
 
 impl Material for Dielectric {
@@ -91,7 +98,9 @@ impl Material for Dielectric {
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
 
-        let dir_out = if cannot_refract {
+        let dir_out = if cannot_refract
+            || Self::reflectance(cos_theta, refraction_ratio) > utils::rand_f64()
+        {
             ray::reflect(unit_direction, rec.normal)
         } else {
             ray::refract(r.direction().normalize(), rec.normal, refraction_ratio)

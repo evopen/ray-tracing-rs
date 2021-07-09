@@ -48,3 +48,8 @@ pub fn rand_vec3_in_unit_sphere() -> Vec3 {
         }
     }
 }
+
+#[inline]
+pub fn rand_vec3_unit() -> Vec3 {
+    rand_vec3_in_unit_sphere().normalize()
+}

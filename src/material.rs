@@ -1,6 +1,6 @@
 use crate::color::Color;
 use crate::hittable::HitRecord;
-use crate::ray::Ray;
+use crate::ray::{self, Ray};
 use crate::utils::rand_vec3_in_unit_sphere;
 use crate::Vec3;
 use crate::{utils, vec3};
@@ -55,7 +55,7 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
-        let reflected = vec3::reflect(r.direction().normalize(), rec.normal);
+        let reflected = ray::reflect(r.direction().normalize(), rec.normal);
         let scattered = Ray::new(rec.p, reflected + self.fuzz * rand_vec3_in_unit_sphere());
 
         if scattered.direction().dot(rec.normal) < 0.0 {
@@ -66,5 +66,32 @@ impl Material for Metal {
                 ray: scattered,
             });
         }
+    }
+}
+
+pub struct Dielectric {
+    pub ir: f64, // index of refraction
+}
+
+impl Dielectric {
+    pub fn new(ir: f64) -> Self {
+        Self { ir }
+    }
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
+        let refraction_ratio = if rec.front_face {
+            1.0 / self.ir
+        } else {
+            self.ir
+        };
+        let refracted = ray::refract(r.direction().normalize(), rec.normal, refraction_ratio);
+
+        let scatter = Scatter {
+            attenuation: Color::splat(1.0),
+            ray: Ray::new(rec.p, refracted),
+        };
+        Some(scatter)
     }
 }

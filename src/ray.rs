@@ -27,3 +27,14 @@ impl Ray {
         self.orig + t * self.dir
     }
 }
+
+pub fn reflect(i: Vec3, n: Vec3) -> Vec3 {
+    i - 2.0 * i.dot(n) * n
+}
+
+pub fn refract(i: Vec3, n: Vec3, index: f64) -> Vec3 {
+    let cos_theta = -i.dot(n).min(1.0);
+    let r_out_perp = index * (i + cos_theta * n);
+    let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
+    return r_out_perp + r_out_parallel;
+}

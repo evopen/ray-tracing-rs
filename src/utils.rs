@@ -53,3 +53,15 @@ pub fn rand_vec3_in_unit_sphere() -> Vec3 {
 pub fn rand_vec3_unit() -> Vec3 {
     rand_vec3_in_unit_sphere().normalize()
 }
+
+#[inline]
+pub fn rand_vec3_in_unit_disk() -> Vec3 {
+    loop {
+        let p = Vec3::new(rand_f64(), rand_f64(), 0.0);
+        if p.length_squared() >= 1.0 {
+            continue;
+        } else {
+            return p;
+        }
+    }
+}

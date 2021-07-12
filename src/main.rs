@@ -47,40 +47,36 @@ fn main() {
     let max_depth = 50;
 
     // World
-    let d = std::f64::consts::FRAC_PI_4.cos();
     let mut world = HittableList::new();
 
-    let material_left = Rc::new(material::Lambertian::new(Color::new(0.0, 0.0, 1.0)));
-    let material_right = Rc::new(material::Lambertian::new(Color::new(1.0, 0.0, 0.0)));
+    let material_ground = Rc::new(material::Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(material::Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_left = Rc::new(material::Dielectric::new(1.5));
+    let material_right = Rc::new(material::Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
 
-    // let material_ground = Rc::new(material::Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    // let material_center = Rc::new(material::Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    // let material_left = Rc::new(material::Dielectric::new(1.5));
-    // let material_right = Rc::new(material::Metal::new(Color::new(0.8, 0.6, 0.2), 0.0));
-
-    // world.add(Rc::new(Sphere::new(
-    //     &Vec3::new(0.0, -100.5, -1.0),
-    //     100.0,
-    //     material_ground,
-    // )));
-    // world.add(Rc::new(Sphere::new(
-    //     &Vec3::new(0.0, 0.0, -1.0),
-    //     0.5,
-    //     material_center,
-    // )));
-    // world.add(Rc::new(Sphere::new(
-    //     &Vec3::new(-1.0, 0.0, -1.0),
-    //     0.5,
-    //     material_left.clone(),
-    // )));
     world.add(Rc::new(Sphere::new(
-        &Vec3::new(-d, 0.0, -1.0),
-        d,
+        &Vec3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left.clone(),
+    )));
+    world.add(Rc::new(Sphere::new(
+        &Vec3::new(-1.0, 0.0, -1.0),
+        -0.45,
         material_left,
     )));
     world.add(Rc::new(Sphere::new(
-        &Vec3::new(d, 0.0, -1.0),
-        d,
+        &Vec3::new(1.0, 0.0, -1.0),
+        0.5,
         material_right,
     )));
 
@@ -96,7 +92,13 @@ fn main() {
         origin - Vec3::new(0.0, 0.0, focal_length) - horizontal / 2.0 - vertical / 2.0;
 
     // Camera
-    let cam = Camera::new(90.0, aspect_ratio);
+    let cam = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        20.0,
+        aspect_ratio,
+    );
 
     // Render
     let mut image_buffer = image::RgbImage::new(image_width, image_height);

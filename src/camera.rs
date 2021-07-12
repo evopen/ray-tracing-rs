@@ -15,19 +15,20 @@ impl Camera {
     /// Description.
     ///
     /// * `vfov` - Vertical field of view in degree
-    pub fn new(vfov: f64, aspect_ratio: f64) -> Self {
+    pub fn new(lookfrom: Point3, lookat: Point3, vup: Vec3, vfov: f64, aspect_ratio: f64) -> Self {
         let theta = vfov.to_radians();
         let h = (theta / 2.0).tan();
         let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
 
-        let focal_length = 1.0;
+        let front = (lookat - lookfrom).normalize();
+        let right = front.cross(vup).normalize();
+        let up = right.cross(front);
 
-        let origin = Point3::new(0.0, 0.0, 0.0);
-        let horizontal = Vec3::new(viewport_width, 0.0, 0.0);
-        let vertical = Vec3::new(0.0, viewport_height, 0.0);
-        let lower_left_corner =
-            origin - Vec3::new(0.0, 0.0, focal_length) - horizontal / 2.0 - vertical / 2.0;
+        let origin = lookfrom;
+        let horizontal = viewport_width * right;
+        let vertical = viewport_height * up;
+        let lower_left_corner = origin + front - horizontal / 2.0 - vertical / 2.0;
 
         Self {
             origin,

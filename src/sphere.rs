@@ -11,7 +11,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(center: &Point3, r: f64, material: Rc<dyn Material>) -> Self {
+    pub fn new(center: Point3, r: f64, material: Rc<dyn Material>) -> Self {
         Self {
             center: center.to_owned(),
             radius: r,

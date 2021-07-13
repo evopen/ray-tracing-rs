@@ -15,3 +15,6 @@ opt-level = 3
 
 [profile.dev]
 opt-level = 2
+
+[profile.release]
+lto = true

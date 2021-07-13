@@ -6,7 +6,7 @@ pub fn write_color(
     img: &mut image::RgbImage,
     x: u32,
     y: u32,
-    color: &Color,
+    color: Color,
     samples_per_pixel: u32,
 ) {
     let mut r = color.x;

@@ -6,7 +6,7 @@ use rand::{Rng, SeedableRng};
 use crate::Vec3;
 
 thread_local! {
-    pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(12345));
+    pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(10086));
 }
 
 #[inline]

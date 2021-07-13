@@ -2,7 +2,6 @@ use crate::color::Color;
 use crate::hittable::HitRecord;
 use crate::ray::{self, Ray};
 use crate::utils::rand_vec3_in_unit_sphere;
-use crate::Vec3;
 use crate::{utils, vec3};
 
 pub struct Scatter {
@@ -10,7 +9,7 @@ pub struct Scatter {
     pub ray: Ray,
 }
 
-pub trait Material {
+pub trait Material: Sync + Send {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter>;
 }
 
@@ -19,7 +18,7 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, _r: &Ray, rec: &HitRecord) -> Option<Scatter> {
         let mut scatter_direction = rec.normal + utils::rand_vec3_unit();
         if vec3::is_near_zero(scatter_direction) {
             scatter_direction = rec.normal;

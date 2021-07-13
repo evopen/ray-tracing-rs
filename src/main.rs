@@ -10,10 +10,13 @@ mod sphere;
 mod utils;
 mod vec3;
 
-use std::rc::Rc;
+use std::io::{stdout, Write};
+use std::sync::Arc;
+use std::time::Duration;
 
 use color::Color;
 use ray::Ray;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use vec3::{Point3, Vec3};
 
 use camera::Camera;
@@ -24,8 +27,8 @@ use sphere::Sphere;
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let ground_material = Rc::new(material::Lambertian::new(Color::splat(0.5)));
-    world.add(Rc::new(Sphere::new(
+    let ground_material = Arc::new(material::Lambertian::new(Color::splat(0.5)));
+    world.add(Arc::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
         ground_material,
@@ -40,40 +43,40 @@ fn random_scene() -> HittableList {
                 b as f64 + 0.9 * utils::rand_f64(),
             );
 
-            if choose_mat < 0.8 {
+            if choose_mat < 0.7 {
                 // diffuse
                 let albedo = utils::rand_vec3() * utils::rand_vec3();
-                let sphere_material = Rc::new(material::Lambertian::new(albedo));
-                world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
-            } else if choose_mat < 0.95 {
+                let sphere_material = Arc::new(material::Lambertian::new(albedo));
+                world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+            } else if choose_mat < 0.85 {
                 // metal
                 let albedo = utils::rand_vec3_range(0.5, 1.0);
                 let fuzz = utils::rand_f64_range(0.0, 0.5);
-                let sphere_material = Rc::new(material::Metal::new(albedo, fuzz));
-                world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                let sphere_material = Arc::new(material::Metal::new(albedo, fuzz));
+                world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
             } else {
-                let sphere_material = Rc::new(material::Dielectric::new(1.5));
-                world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
+                let sphere_material = Arc::new(material::Dielectric::new(1.5));
+                world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
             }
         }
     }
 
-    let material1 = Rc::new(material::Dielectric::new(1.5));
-    world.add(Rc::new(Sphere::new(
+    let material1 = Arc::new(material::Dielectric::new(1.5));
+    world.add(Arc::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),
         1.0,
         material1,
     )));
 
-    let material2 = Rc::new(material::Lambertian::new(Color::new(0.4, 0.2, 0.1)));
-    world.add(Rc::new(Sphere::new(
+    let material2 = Arc::new(material::Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    world.add(Arc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
         1.0,
         material2,
     )));
 
-    let material3 = Rc::new(material::Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.add(Rc::new(Sphere::new(
+    let material3 = Arc::new(material::Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
+    world.add(Arc::new(Sphere::new(
         Point3::new(4.0, 1.0, 0.0),
         1.0,
         material3,
@@ -129,19 +132,50 @@ fn main() {
     // Render
     let mut image_buffer = image::RgbImage::new(image_width, image_height);
 
-    for y in (0..image_height).rev() {
-        println!("\rScanlines remaining: {}", y);
+    let (tx, rx) = crossbeam::channel::bounded((image_width * image_height) as usize);
+
+    let worker_thread = std::thread::spawn(move || {
+        println!("job started");
+        let mut job_indices = Vec::with_capacity((image_width * image_height) as usize);
         for x in 0..image_width {
-            let mut pixel_color = Color::splat(0.0);
-            for _ in 0..samples_per_pixel {
-                let u = (x as f64 + utils::rand_f64()) / (image_width - 1) as f64;
-                let v = (y as f64 + utils::rand_f64()) / (image_height - 1) as f64;
-                let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, max_depth);
+            for y in 0..image_height {
+                job_indices.push((x, y));
             }
-            color::write_color(&mut image_buffer, x, y, &pixel_color, samples_per_pixel);
+        }
+        job_indices
+            .into_par_iter()
+            .for_each_with(tx.clone(), |tx, (x, y)| {
+                let mut pixel_color = Color::splat(0.0);
+                for _ in 0..samples_per_pixel {
+                    let u = (x as f64 + utils::rand_f64()) / (image_width - 1) as f64;
+                    let v = (y as f64 + utils::rand_f64()) / (image_height - 1) as f64;
+                    let r = cam.get_ray(u, v);
+                    pixel_color += ray_color(&r, &world, max_depth);
+                }
+                // dbg!((x, y));
+                tx.send(((x, y), pixel_color)).unwrap();
+            });
+    });
+
+    loop {
+        std::thread::sleep(Duration::from_millis(500));
+        let jobs_done = rx.len();
+        print!(
+            "\rCompleted {:.1}%     ",
+            jobs_done as f64 / (image_width * image_height) as f64 * 100.0
+        );
+        stdout().flush().unwrap();
+
+        if rx.is_full() {
+            worker_thread.join().unwrap();
+            break;
         }
     }
-    println!("Done");
+
+    while let Ok(((x, y), color)) = rx.recv() {
+        color::write_color(&mut image_buffer, x, y, color, samples_per_pixel);
+    }
+
+    println!("\nDone");
     image_buffer.save("result.png").unwrap();
 }

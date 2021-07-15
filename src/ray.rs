@@ -5,6 +5,7 @@ use crate::Vec3;
 pub struct Ray {
     pub orig: Point3,
     pub dir: Vec3,
+    time: f64,
 }
 
 impl Ray {
@@ -12,7 +13,12 @@ impl Ray {
         Self {
             orig: origin.to_owned(),
             dir: direction.to_owned(),
+            time: 0.0,
         }
+    }
+
+    pub fn time(&self) -> f64 {
+        return self.time;
     }
 
     pub fn origin(&self) -> Point3 {

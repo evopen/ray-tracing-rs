@@ -17,6 +17,14 @@ impl Ray {
         }
     }
 
+    pub fn new_with_time(origin: Point3, direction: Vec3, time: f64) -> Self {
+        Self {
+            orig: origin.to_owned(),
+            dir: direction.to_owned(),
+            time,
+        }
+    }
+
     pub fn time(&self) -> f64 {
         return self.time;
     }

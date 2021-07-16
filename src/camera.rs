@@ -1,3 +1,5 @@
+use core::f64;
+
 use crate::ray::Ray;
 use crate::vec3::Point3;
 use crate::{utils, Vec3};
@@ -11,6 +13,8 @@ pub struct Camera {
     right: Vec3,
     up: Vec3,
     lens_radius: f64,
+    time_0: f64,
+    time_1: f64,
 }
 
 impl Camera {
@@ -55,14 +59,44 @@ impl Camera {
             right,
             up,
             lens_radius,
+            time_0: 0.0,
+            time_1: 0.0,
         }
     }
+
+    pub fn new_with_time_range(
+        lookfrom: Point3,
+        lookat: Point3,
+        vup: Vec3,
+        vfov: f64,
+        aspect_ratio: f64,
+        aperture: f64,
+        focus_dist: f64,
+        time_0: f64,
+        time_1: f64,
+    ) -> Self {
+        let mut this = Self::new(
+            lookfrom,
+            lookat,
+            vup,
+            vfov,
+            aspect_ratio,
+            aperture,
+            focus_dist,
+        );
+        this.time_0 = time_0;
+        this.time_1 = time_1;
+
+        this
+    }
+
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         let rd = self.lens_radius * utils::rand_vec3_in_unit_disk();
         let offset = self.right * rd.x + self.up * rd.y;
-        Ray::new(
+        Ray::new_with_time(
             self.origin + offset,
             self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset,
+            utils::rand_f64_range(self.time_0, self.time_1),
         )
     }
 }

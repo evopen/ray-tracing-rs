@@ -49,7 +49,15 @@ fn random_scene() -> HittableList {
                 // diffuse
                 let albedo = utils::rand_vec3() * utils::rand_vec3();
                 let sphere_material = Arc::new(material::Lambertian::new(albedo));
-                world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
+                let center_1 = center + Vec3::new(0.0, utils::rand_f64_range(0.0, 0.5), 0.0);
+                world.add(Arc::new(MovingSphere::new(
+                    center,
+                    center_1,
+                    0.0,
+                    1.0,
+                    0.2,
+                    sphere_material,
+                )));
             } else if choose_mat < 0.85 {
                 // metal
                 let albedo = utils::rand_vec3_range(0.5, 1.0);
@@ -106,10 +114,10 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
 
 fn main() {
     // Image
-    let aspect_ratio = 3.0 / 2.0;
-    let image_width = 1200;
+    let aspect_ratio = 16.0 / 9.0;
+    let image_width = 400;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let samples_per_pixel = 500;
+    let samples_per_pixel = 100;
     let max_depth = 50;
 
     // World
@@ -121,7 +129,7 @@ fn main() {
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;
-    let cam = Camera::new(
+    let cam = Camera::new_with_time_range(
         lookfrom,
         lookat,
         vup,
@@ -129,6 +137,8 @@ fn main() {
         aspect_ratio,
         aperture,
         dist_to_focus,
+        0.0,
+        1.0,
     );
 
     // Render

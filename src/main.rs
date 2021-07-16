@@ -5,6 +5,7 @@ mod color;
 mod hittable;
 mod hittable_list;
 mod material;
+mod moving_sphere;
 mod ray;
 mod sphere;
 mod utils;
@@ -22,6 +23,7 @@ use vec3::{Point3, Vec3};
 use camera::Camera;
 use hittable::Hittable;
 use hittable_list::HittableList;
+use moving_sphere::MovingSphere;
 use sphere::Sphere;
 
 fn random_scene() -> HittableList {

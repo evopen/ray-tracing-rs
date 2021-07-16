@@ -93,10 +93,15 @@ impl Camera {
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         let rd = self.lens_radius * utils::rand_vec3_in_unit_disk();
         let offset = self.right * rd.x + self.up * rd.y;
+        let time = if (self.time_0 - self.time_1).abs() < f64::EPSILON {
+            0.0
+        } else {
+            utils::rand_f64_range(self.time_0, self.time_1)
+        };
         Ray::new_with_time(
             self.origin + offset,
             self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin - offset,
-            utils::rand_f64_range(self.time_0, self.time_1),
+            time,
         )
     }
 }

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::aabb::AABB;
 use crate::hittable::{HitRecord, Hittable};
 
 pub struct HittableList {
@@ -32,5 +33,26 @@ impl Hittable for HittableList {
         }
 
         return result;
+    }
+
+    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<crate::aabb::AABB> {
+        if self.objects.is_empty() {
+            return None;
+        };
+        let mut object_iter = self.objects.iter();
+        let mut bounding_box =
+            if let Some(bb) = object_iter.next().unwrap().bounding_box(time_0, time_1) {
+                bb
+            } else {
+                return None;
+            };
+        while let Some(object) = object_iter.next() {
+            if let Some(b) = object.bounding_box(time_0, time_1) {
+                bounding_box = b.surrounding_box(&bounding_box);
+            } else {
+                return None;
+            }
+        }
+        Some(bounding_box)
     }
 }

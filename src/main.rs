@@ -1,5 +1,6 @@
 // based on ray tracing in one weekend 3.2.3
 
+mod aabb;
 mod camera;
 mod color;
 mod hittable;

@@ -12,6 +12,8 @@ pub struct HitRecord {
     pub normal: Vec3,
     pub material: Arc<dyn Material>,
     pub t: f64,
+    pub u: f64,
+    pub v: f64,
     pub front_face: bool,
 }
 
@@ -23,6 +25,8 @@ impl HitRecord {
             t,
             front_face: false,
             material: material.clone(),
+            u: 0.0,
+            v: 0.0,
         }
     }
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {

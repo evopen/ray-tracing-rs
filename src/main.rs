@@ -1,5 +1,7 @@
 // based on ray tracing in one weekend 3.2.3
 
+#![feature(destructuring_assignment)]
+
 mod aabb;
 mod bvh;
 mod camera;

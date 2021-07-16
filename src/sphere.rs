@@ -1,3 +1,4 @@
+use std::f64::consts::PI;
 use std::sync::Arc;
 
 use crate::aabb::AABB;
@@ -19,6 +20,13 @@ impl Sphere {
             radius: r,
             material: material.clone(),
         }
+    }
+
+    fn get_uv(p: Point3) -> (f64, f64) {
+        let theta = (-p.y).acos();
+        let phi = (-p.z).atan2(p.x) + std::f64::consts::PI;
+
+        (phi / (2.0 * PI), theta / PI)
     }
 }
 
@@ -46,6 +54,7 @@ impl crate::hittable::Hittable for Sphere {
 
         let mut rec = HitRecord::new(&p, &outward_normal, t, &self.material);
         rec.set_face_normal(r, &outward_normal);
+        (rec.u, rec.v) = Self::get_uv(rec.normal);
 
         return Some(rec);
     }

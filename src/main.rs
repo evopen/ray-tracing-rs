@@ -23,6 +23,7 @@ use std::time::Duration;
 use color::Color;
 use ray::Ray;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use texture::CheckerTexture;
 use vec3::{Point3, Vec3};
 
 use aabb::AABB;
@@ -35,7 +36,11 @@ use sphere::Sphere;
 fn random_scene() -> HittableList {
     let mut world = HittableList::new();
 
-    let ground_material = Arc::new(material::Lambertian::new(Color::splat(0.5)));
+    let checker = Arc::new(CheckerTexture::new_with_color(
+        Color::new(0.2, 0.3, 0.1),
+        Color::splat(0.9),
+    ));
+    let ground_material = Arc::new(material::Lambertian::new(checker));
     world.add(Arc::new(Sphere::new(
         Point3::new(0.0, -1000.0, 0.0),
         1000.0,
@@ -54,7 +59,7 @@ fn random_scene() -> HittableList {
             if choose_mat < 0.7 {
                 // diffuse
                 let albedo = utils::rand_vec3() * utils::rand_vec3();
-                let sphere_material = Arc::new(material::Lambertian::new(albedo));
+                let sphere_material = Arc::new(material::Lambertian::new_with_color(albedo));
                 let center_1 = center + Vec3::new(0.0, utils::rand_f64_range(0.0, 0.5), 0.0);
                 world.add(Arc::new(MovingSphere::new(
                     center,
@@ -84,7 +89,9 @@ fn random_scene() -> HittableList {
         material1,
     )));
 
-    let material2 = Arc::new(material::Lambertian::new(Color::new(0.4, 0.2, 0.1)));
+    let material2 = Arc::new(material::Lambertian::new_with_color(Color::new(
+        0.4, 0.2, 0.1,
+    )));
     world.add(Arc::new(Sphere::new(
         Point3::new(-4.0, 1.0, 0.0),
         1.0,

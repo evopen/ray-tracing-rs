@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::color::Color;
 use crate::vec3::Point3;
 
@@ -23,6 +25,31 @@ impl SolidColor {
     pub fn new_with_rgb(r: f64, g: f64, b: f64) -> Self {
         Self {
             color: Color::new(r, g, b),
+        }
+    }
+}
+
+pub struct CheckerTexture {
+    odd: Arc<dyn Texture>,
+    even: Arc<dyn Texture>,
+}
+
+impl CheckerTexture {
+    pub fn new_with_color(odd: Color, even: Color) -> Self {
+        Self {
+            odd: Arc::new(SolidColor::new(odd)),
+            even: Arc::new(SolidColor::new(even)),
+        }
+    }
+}
+
+impl Texture for CheckerTexture {
+    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+        let sines = (10.0 * p.x).sin() * (10.0 * p.y).sin() * (10.0 * p.z).sin();
+        if sines < 0.0 {
+            return self.odd.value(u, v, p);
+        } else {
+            return self.even.value(u, v, p);
         }
     }
 }

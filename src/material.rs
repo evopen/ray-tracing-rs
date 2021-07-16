@@ -34,9 +34,15 @@ impl Material for Lambertian {
 }
 
 impl Lambertian {
-    pub fn new(base_color: Color) -> Self {
+    pub fn new(texture: Arc<dyn Texture>) -> Self {
         Self {
-            base_color: Arc::new(SolidColor::new(base_color)),
+            base_color: texture,
+        }
+    }
+
+    pub fn new_with_color(color: Color) -> Self {
+        Self {
+            base_color: Arc::new(SolidColor::new(color)),
         }
     }
 }

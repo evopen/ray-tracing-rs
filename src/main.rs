@@ -10,6 +10,7 @@ mod material;
 mod moving_sphere;
 mod ray;
 mod sphere;
+mod texture;
 mod utils;
 mod vec3;
 

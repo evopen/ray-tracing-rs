@@ -32,7 +32,7 @@ impl AABB {
                 .max((self.maximum[i] - r.origin()[i]) / r.direction()[i]);
             t_min = t0.max(t_min);
             t_max = t1.min(t_max);
-            if t_max >= t_min {
+            if t_max <= t_min {
                 return false;
             }
         }

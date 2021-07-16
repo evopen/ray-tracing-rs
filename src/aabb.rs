@@ -1,7 +1,8 @@
 use crate::ray::Ray;
 use crate::vec3::Point3;
 
-struct AABB {
+#[derive(Clone)]
+pub struct AABB {
     minimum: Point3,
     maximum: Point3,
 }
@@ -39,5 +40,21 @@ impl AABB {
             }
         }
         true
+    }
+
+    pub fn surrounding_box(&self, other: &AABB) -> AABB {
+        let small = Point3::new(
+            self.min().x.min(other.min().x),
+            self.min().y.min(other.min().y),
+            self.min().z.min(other.min().z),
+        );
+
+        let big = Point3::new(
+            self.max().x.max(other.max().x),
+            self.max().y.max(other.max().y),
+            self.max().z.max(other.max().z),
+        );
+
+        AABB::new(small, big)
     }
 }

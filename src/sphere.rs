@@ -1,8 +1,10 @@
 use std::sync::Arc;
 
+use crate::aabb::AABB;
 use crate::hittable::HitRecord;
 use crate::material::Material;
 use crate::vec3::Point3;
+use crate::Vec3;
 
 pub struct Sphere {
     pub center: Point3,
@@ -46,5 +48,12 @@ impl crate::hittable::Hittable for Sphere {
         rec.set_face_normal(r, &outward_normal);
 
         return Some(rec);
+    }
+
+    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<crate::aabb::AABB> {
+        Some(AABB::new(
+            self.center - Vec3::splat(self.radius),
+            self.center + Vec3::splat(self.radius),
+        ))
     }
 }

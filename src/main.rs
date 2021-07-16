@@ -108,6 +108,25 @@ fn random_scene() -> HittableList {
     world
 }
 
+fn two_spheres() -> HittableList {
+    let mut objects = HittableList::new();
+    let checker = Arc::new(CheckerTexture::new_with_color(
+        Color::new(0.2, 0.3, 0.1),
+        Color::splat(0.9),
+    ));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, -10.0, 0.0),
+        10.0,
+        Arc::new(material::Lambertian::new(checker.clone())),
+    )));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, 10.0, 0.0),
+        10.0,
+        Arc::new(material::Lambertian::new(checker.clone())),
+    )));
+    objects
+}
+
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
         return Color::splat(0.0);
@@ -134,19 +153,35 @@ fn main() {
     let max_depth = 50;
 
     // World
-    let world = random_scene();
+    let world;
+    let lookfrom;
+    let lookat;
+    let mut vfov = 40.0;
+    let mut aperture = 0.0;
+
+    match 0 {
+        1 => {
+            world = random_scene();
+            lookfrom = Point3::new(13.0, 2.0, 3.0);
+            lookat = Point3::splat(0.0);
+            vfov = 20.0;
+        }
+        2 | _ => {
+            world = two_spheres();
+            lookfrom = Point3::new(13.0, 2.0, 3.0);
+            lookat = Point3::splat(0.0);
+            vfov = 20.0;
+        }
+    }
 
     // Camera
-    let lookfrom = Point3::new(13.0, 2.0, 3.0);
-    let lookat = Point3::splat(0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
-    let aperture = 0.1;
     let cam = Camera::new_with_time_range(
         lookfrom,
         lookat,
         vup,
-        20.0,
+        vfov,
         aspect_ratio,
         aperture,
         dist_to_focus,

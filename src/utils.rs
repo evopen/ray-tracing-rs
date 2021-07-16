@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 
+use rand::distributions::uniform::{SampleRange, SampleUniform};
 use rand::prelude::SmallRng;
 use rand::{Rng, SeedableRng};
 
@@ -7,6 +8,15 @@ use crate::Vec3;
 
 thread_local! {
     pub static RNG: RefCell<SmallRng> = RefCell::new(SmallRng::seed_from_u64(10086));
+}
+
+#[inline]
+pub fn gen_range<T, R>(range: R) -> T
+where
+    T: SampleUniform,
+    R: SampleRange<T>,
+{
+    RNG.with(|f| f.borrow_mut().gen_range(range))
 }
 
 #[inline]

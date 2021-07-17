@@ -2,11 +2,12 @@ use std::ops::BitAnd;
 
 use crate::utils;
 use crate::vec3::Point3;
+use crate::Vec3;
 
 const POINT_COUNT: usize = 256;
 
 pub struct Perlin {
-    ranfloat: Vec<f64>,
+    ranvec: Vec<Vec3>,
     perm_x: Vec<usize>,
     perm_y: Vec<usize>,
     perm_z: Vec<usize>,
@@ -14,16 +15,16 @@ pub struct Perlin {
 
 impl Default for Perlin {
     fn default() -> Self {
-        let mut ranfloat = Vec::with_capacity(POINT_COUNT);
+        let mut ranvec = Vec::with_capacity(POINT_COUNT);
         for _ in 0..POINT_COUNT {
-            ranfloat.push(utils::rand_f64());
+            ranvec.push(utils::rand_vec3_range(-1.0, 1.0));
         }
         let perm_x = Self::perlin_generate_perm();
         let perm_y = Self::perlin_generate_perm();
         let perm_z = Self::perlin_generate_perm();
 
         Self {
-            ranfloat,
+            ranvec,
             perm_x,
             perm_y,
             perm_z,
@@ -52,23 +53,20 @@ impl Perlin {
     pub fn noise(&self, p: Point3) -> f64 {
         let max = (POINT_COUNT - 1) as i32;
 
-        let mut u = p.x - p.x.floor();
-        let mut v = p.y - p.y.floor();
-        let mut w = p.z - p.z.floor();
-        u = u * u * (3.0 - 2.0 * u);
-        v = v * v * (3.0 - 2.0 * v);
-        w = w * w * (3.0 - 2.0 * w);
+        let u = p.x - p.x.floor();
+        let v = p.y - p.y.floor();
+        let w = p.z - p.z.floor();
 
         let i = p.x.floor() as i32;
         let j = p.y.floor() as i32;
         let k = p.z.floor() as i32;
 
-        let mut color: [[[f64; 2]; 2]; 2] = Default::default();
+        let mut color_v: [[[Vec3; 2]; 2]; 2] = Default::default();
 
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    color[di][dj][dk] = self.ranfloat[self.perm_x
+                    color_v[di][dj][dk] = self.ranvec[self.perm_x
                         [((i + di as i32).bitand(max)) as usize]
                         ^ self.perm_y[((j + dj as i32).bitand(max)) as usize]
                         ^ self.perm_z[((k + dk as i32).bitand(max)) as usize]]
@@ -76,10 +74,10 @@ impl Perlin {
             }
         }
 
-        return Self::trilinear_interp(color, u, v, w);
+        return Self::trilinear_interp(color_v, u, v, w);
     }
 
-    fn trilinear_interp(color: [[[f64; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+    fn trilinear_interp(color_v: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         let mut accumulate = 0.0;
         for i in 0..2 {
             for j in 0..2 {
@@ -87,10 +85,14 @@ impl Perlin {
                     let fi = i as f64;
                     let fj = j as f64;
                     let fk = k as f64;
+
                     let weight = (fi * u + (1.0 - fi) * (1.0 - u))
                         * (fj * v + (1.0 - fj) * (1.0 - v))
                         * (fk * w + (1.0 - fk) * (1.0 - w));
-                    accumulate += color[i][j][k] * weight;
+
+                    let weight_v = Vec3::new(u - fi, v - fj, w - fk);
+
+                    accumulate += color_v[i][j][k].dot(weight_v) * weight;
                 }
             }
         }

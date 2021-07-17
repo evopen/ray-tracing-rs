@@ -34,7 +34,7 @@ pub fn build_app() -> App<'static, 'static> {
         .version(env!("CARGO_PKG_VERSION"))
         .arg(
             Arg::with_name("scene")
-                .default_value("2")
+                .default_value("0")
                 .takes_value(true)
                 .long("scene"),
         )

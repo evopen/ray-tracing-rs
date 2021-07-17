@@ -53,3 +53,14 @@ impl Texture for CheckerTexture {
         }
     }
 }
+
+#[derive(Default)]
+pub struct NoiseTexture {
+    noise: super::perlin::Perlin,
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+        Color::splat(1.0) * self.noise.noise(p)
+    }
+}

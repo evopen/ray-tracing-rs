@@ -11,6 +11,7 @@ mod hittable;
 mod hittable_list;
 mod material;
 mod moving_sphere;
+mod perlin;
 mod ray;
 mod sphere;
 mod texture;
@@ -24,7 +25,7 @@ use std::time::Duration;
 use color::Color;
 use ray::Ray;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use texture::CheckerTexture;
+use texture::{CheckerTexture, NoiseTexture};
 use vec3::{Point3, Vec3};
 
 use aabb::AABB;
@@ -128,6 +129,22 @@ fn two_spheres() -> HittableList {
     objects
 }
 
+fn two_perlin_spheres() -> HittableList {
+    let mut objects = HittableList::new();
+    let perlin_texture = Arc::new(NoiseTexture::default());
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Arc::new(material::Lambertian::new(perlin_texture.clone())),
+    )));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Arc::new(material::Lambertian::new(perlin_texture.clone())),
+    )));
+    objects
+}
+
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
         return Color::splat(0.0);
@@ -182,8 +199,14 @@ fn main() {
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
-        2 | _ => {
+        2 => {
             hittable_list = two_spheres();
+            lookfrom = Point3::new(13.0, 2.0, 3.0);
+            lookat = Point3::splat(0.0);
+            vfov = 20.0;
+        }
+        3 | _ => {
+            hittable_list = two_perlin_spheres();
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
@@ -236,7 +259,6 @@ fn main() {
                     let r = cam.get_ray(u, v);
                     pixel_color += ray_color(&r, world.as_ref(), max_depth);
                 }
-                // dbg!((x, y));
                 tx.send(((x, y), pixel_color)).unwrap();
             });
     });

@@ -12,6 +12,7 @@ rand = { version = "0.8", features = ["small_rng"] }
 rayon = "1.5.1"
 crossbeam = "0.8.1"
 clap = "2.33"
+num_cpus = "1.13.0"
 
 [profile.dev.package."*"]
 opt-level = 3

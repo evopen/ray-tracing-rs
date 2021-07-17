@@ -60,4 +60,5 @@ pub fn build_app() -> App<'static, 'static> {
                 .validator(integer_non_zero_validator),
         )
         .arg(Arg::with_name("use bvh").takes_value(false).long("bvh"))
+        .arg(Arg::with_name("job").takes_value(true).short("j"))
 }

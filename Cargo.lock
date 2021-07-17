@@ -360,6 +360,7 @@ dependencies = [
  "crossbeam",
  "glam",
  "image",
+ "num_cpus",
  "rand",
  "rayon",
 ]

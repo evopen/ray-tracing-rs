@@ -166,6 +166,15 @@ fn main() {
     let matches = cli::build_app().get_matches();
     let scene = matches.value_of("scene").unwrap().parse::<u32>().unwrap();
     let use_bvh = matches.is_present("use bvh");
+    let threads = matches
+        .value_of("job")
+        .map(|j| j.parse::<usize>().unwrap())
+        .unwrap_or(num_cpus::get());
+
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(threads)
+        .build_global()
+        .unwrap();
 
     // Image
     let aspect_ratio = matches

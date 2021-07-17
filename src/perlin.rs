@@ -77,6 +77,20 @@ impl Perlin {
         return Self::trilinear_interp(color_v, u, v, w);
     }
 
+    pub fn turb(&self, p: Point3, depth: u32) -> f64 {
+        let mut accum = 0.0;
+        let mut p = p;
+        let mut weight = 1.0;
+
+        for _ in 0..depth {
+            accum += weight * self.noise(p);
+            weight *= 0.5;
+            p *= 2.0;
+        }
+
+        return accum.abs();
+    }
+
     fn trilinear_interp(color_v: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
         let mut accumulate = 0.0;
         for i in 0..2 {

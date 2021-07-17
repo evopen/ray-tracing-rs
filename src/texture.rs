@@ -12,7 +12,7 @@ pub struct SolidColor {
 }
 
 impl Texture for SolidColor {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn value(&self, _u: f64, _v: f64, _p: Point3) -> Color {
         return self.color;
     }
 }

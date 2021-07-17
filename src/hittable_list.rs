@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use crate::aabb::AABB;
 use crate::bvh::BVHNode;
 use crate::hittable::{HitRecord, Hittable};
 

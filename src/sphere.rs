@@ -59,7 +59,7 @@ impl crate::hittable::Hittable for Sphere {
         return Some(rec);
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<crate::aabb::AABB> {
+    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<crate::aabb::AABB> {
         Some(AABB::new(
             self.center - Vec3::splat(self.radius),
             self.center + Vec3::splat(self.radius),

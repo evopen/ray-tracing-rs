@@ -28,7 +28,6 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use texture::{CheckerTexture, NoiseTexture};
 use vec3::{Point3, Vec3};
 
-use aabb::AABB;
 use camera::Camera;
 use hittable::Hittable;
 use hittable_list::HittableList;

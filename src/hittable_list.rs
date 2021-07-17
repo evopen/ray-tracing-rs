@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::aabb::AABB;
+use crate::bvh::BVHNode;
 use crate::hittable::{HitRecord, Hittable};
 
 pub struct HittableList {
@@ -17,6 +18,10 @@ impl HittableList {
 
     pub fn clear(&mut self) {
         self.objects.clear();
+    }
+
+    pub fn build_bvh(&self, time_0: f64, time_1: f64) -> BVHNode {
+        BVHNode::new(&self.objects, time_0, time_1)
     }
 }
 

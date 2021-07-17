@@ -5,6 +5,7 @@
 mod aabb;
 mod bvh;
 mod camera;
+mod cli;
 mod color;
 mod hittable;
 mod hittable_list;
@@ -145,34 +146,55 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
 }
 
 fn main() {
+    // Parameters
+    let matches = cli::build_app().get_matches();
+    let scene = matches.value_of("scene").unwrap().parse::<u32>().unwrap();
+    let use_bvh = matches.is_present("use bvh");
+
     // Image
-    let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400;
+    let aspect_ratio = matches
+        .value_of("aspect ratio")
+        .map(|s| {
+            let (a, b) = s.split_once(':').unwrap();
+            a.parse::<f64>().unwrap() / b.parse::<f64>().unwrap()
+        })
+        .unwrap();
+    let image_width = matches.value_of("width").unwrap().parse().unwrap();
     let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let samples_per_pixel = 100;
+    let samples_per_pixel = matches
+        .value_of("samples per pixel")
+        .unwrap()
+        .parse()
+        .unwrap();
     let max_depth = 50;
 
     // World
-    let world;
+    let hittable_list;
     let lookfrom;
     let lookat;
     let mut vfov = 40.0;
     let mut aperture = 0.0;
 
-    match 0 {
+    match scene {
         1 => {
-            world = random_scene();
+            hittable_list = random_scene();
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         2 | _ => {
-            world = two_spheres();
+            hittable_list = two_spheres();
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
     }
+    let bvh = hittable_list.build_bvh(0.0, 1.0);
+
+    let world: Box<dyn Hittable> = match use_bvh {
+        true => Box::new(bvh),
+        false => Box::new(hittable_list),
+    };
 
     // Camera
     let vup = Vec3::new(0.0, 1.0, 0.0);
@@ -190,6 +212,8 @@ fn main() {
     );
 
     // Render
+    let start_time = std::time::Instant::now();
+
     let mut image_buffer = image::RgbImage::new(image_width, image_height);
 
     let (tx, rx) = crossbeam::channel::bounded((image_width * image_height) as usize);
@@ -210,7 +234,7 @@ fn main() {
                     let u = (x as f64 + utils::rand_f64()) / (image_width - 1) as f64;
                     let v = (y as f64 + utils::rand_f64()) / (image_height - 1) as f64;
                     let r = cam.get_ray(u, v);
-                    pixel_color += ray_color(&r, &world, max_depth);
+                    pixel_color += ray_color(&r, world.as_ref(), max_depth);
                 }
                 // dbg!((x, y));
                 tx.send(((x, y), pixel_color)).unwrap();
@@ -236,6 +260,6 @@ fn main() {
         color::write_color(&mut image_buffer, x, y, color, samples_per_pixel);
     }
 
-    println!("\nDone");
+    println!("\nDone, took {} seconds", start_time.elapsed().as_secs());
     image_buffer.save("result.png").unwrap();
 }

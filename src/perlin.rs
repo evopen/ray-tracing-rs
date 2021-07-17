@@ -51,15 +51,15 @@ impl Perlin {
     }
 
     pub fn noise(&self, p: Point3) -> f64 {
-        let max = (POINT_COUNT - 1) as i32;
+        let max = (POINT_COUNT - 1) as i64;
 
         let u = p.x - p.x.floor();
         let v = p.y - p.y.floor();
         let w = p.z - p.z.floor();
 
-        let i = p.x.floor() as i32;
-        let j = p.y.floor() as i32;
-        let k = p.z.floor() as i32;
+        let i = p.x.floor() as i64;
+        let j = p.y.floor() as i64;
+        let k = p.z.floor() as i64;
 
         let mut color_v: [[[Vec3; 2]; 2]; 2] = Default::default();
 
@@ -67,9 +67,9 @@ impl Perlin {
             for dj in 0..2 {
                 for dk in 0..2 {
                     color_v[di][dj][dk] = self.ranvec[self.perm_x
-                        [((i + di as i32).bitand(max)) as usize]
-                        ^ self.perm_y[((j + dj as i32).bitand(max)) as usize]
-                        ^ self.perm_z[((k + dk as i32).bitand(max)) as usize]]
+                        [((i + di as i64).bitand(max)) as usize]
+                        ^ self.perm_y[((j + dj as i64).bitand(max)) as usize]
+                        ^ self.perm_z[((k + dk as i64).bitand(max)) as usize]]
                 }
             }
         }

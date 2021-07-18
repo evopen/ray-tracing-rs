@@ -14,6 +14,7 @@ mod material;
 mod moving_sphere;
 mod perlin;
 mod ray;
+mod scene;
 mod sphere;
 mod texture;
 mod utils;
@@ -26,134 +27,10 @@ use std::time::Duration;
 use color::Color;
 use ray::Ray;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use texture::{CheckerTexture, ImageTexture, NoiseTexture};
 use vec3::{Point3, Vec3};
 
 use camera::Camera;
 use hittable::Hittable;
-use hittable_list::HittableList;
-use moving_sphere::MovingSphere;
-use sphere::Sphere;
-
-fn random_scene() -> HittableList {
-    let mut world = HittableList::new();
-
-    let checker = Arc::new(CheckerTexture::new_with_color(
-        Color::new(0.2, 0.3, 0.1),
-        Color::splat(0.9),
-    ));
-    let ground_material = Arc::new(material::Lambertian::new(checker));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(0.0, -1000.0, 0.0),
-        1000.0,
-        ground_material,
-    )));
-
-    for a in -11..11 {
-        for b in -11..11 {
-            let choose_mat = utils::rand_f64();
-            let center = Point3::new(
-                a as f64 + 0.9 * utils::rand_f64(),
-                0.2,
-                b as f64 + 0.9 * utils::rand_f64(),
-            );
-
-            if choose_mat < 0.7 {
-                // diffuse
-                let albedo = utils::rand_vec3() * utils::rand_vec3();
-                let sphere_material = Arc::new(material::Lambertian::new_with_color(albedo));
-                let center_1 = center + Vec3::new(0.0, utils::rand_f64_range(0.0, 0.5), 0.0);
-                world.add(Arc::new(MovingSphere::new(
-                    center,
-                    center_1,
-                    0.0,
-                    1.0,
-                    0.2,
-                    sphere_material,
-                )));
-            } else if choose_mat < 0.85 {
-                // metal
-                let albedo = utils::rand_vec3_range(0.5, 1.0);
-                let fuzz = utils::rand_f64_range(0.0, 0.5);
-                let sphere_material = Arc::new(material::Metal::new(albedo, fuzz));
-                world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
-            } else {
-                let sphere_material = Arc::new(material::Dielectric::new(1.5));
-                world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
-            }
-        }
-    }
-
-    let material1 = Arc::new(material::Dielectric::new(1.5));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(0.0, 1.0, 0.0),
-        1.0,
-        material1,
-    )));
-
-    let material2 = Arc::new(material::Lambertian::new_with_color(Color::new(
-        0.4, 0.2, 0.1,
-    )));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(-4.0, 1.0, 0.0),
-        1.0,
-        material2,
-    )));
-
-    let material3 = Arc::new(material::Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    world.add(Arc::new(Sphere::new(
-        Point3::new(4.0, 1.0, 0.0),
-        1.0,
-        material3,
-    )));
-
-    world
-}
-
-fn two_spheres() -> HittableList {
-    let mut objects = HittableList::new();
-    let checker = Arc::new(CheckerTexture::new_with_color(
-        Color::new(0.2, 0.3, 0.1),
-        Color::splat(0.9),
-    ));
-    objects.add(Arc::new(Sphere::new(
-        Point3::new(0.0, -10.0, 0.0),
-        10.0,
-        Arc::new(material::Lambertian::new(checker.clone())),
-    )));
-    objects.add(Arc::new(Sphere::new(
-        Point3::new(0.0, 10.0, 0.0),
-        10.0,
-        Arc::new(material::Lambertian::new(checker.clone())),
-    )));
-    objects
-}
-
-fn two_perlin_spheres() -> HittableList {
-    let mut objects = HittableList::new();
-    let perlin_texture = Arc::new(NoiseTexture::new(4.0));
-    objects.add(Arc::new(Sphere::new(
-        Point3::new(0.0, -1000.0, 0.0),
-        1000.0,
-        Arc::new(material::Lambertian::new(perlin_texture.clone())),
-    )));
-    objects.add(Arc::new(Sphere::new(
-        Point3::new(0.0, 2.0, 0.0),
-        2.0,
-        Arc::new(material::Lambertian::new(perlin_texture.clone())),
-    )));
-    objects
-}
-
-fn earth() -> HittableList {
-    let earth_texture = Arc::new(ImageTexture::new("image/earthmap.jpg"));
-    let earth_surface = Arc::new(material::Lambertian::new(earth_texture));
-    let globe = Arc::new(Sphere::new(Point3::default(), 2.0, earth_surface));
-
-    let mut list = HittableList::new();
-    list.add(globe);
-    list
-}
 
 fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
@@ -214,35 +91,35 @@ fn main() {
 
     match scene {
         1 => {
-            hittable_list = random_scene();
+            hittable_list = scene::random_scene();
             background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         2 => {
-            hittable_list = two_spheres();
+            hittable_list = scene::two_spheres();
             background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         3 => {
-            hittable_list = two_perlin_spheres();
+            hittable_list = scene::two_perlin_spheres();
             background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         4 => {
-            hittable_list = earth();
+            hittable_list = scene::earth();
             background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         5 | _ => {
-            hittable_list = earth();
+            hittable_list = scene::earth();
             background = Color::splat(0.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);

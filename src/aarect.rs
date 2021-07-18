@@ -48,6 +48,32 @@ impl XYRect {
     }
 }
 
+impl XZRect {
+    pub fn new(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, material: Arc<dyn Material>) -> Self {
+        Self {
+            x0,
+            x1,
+            z0,
+            z1,
+            k,
+            material,
+        }
+    }
+}
+
+impl YZRect {
+    pub fn new(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, material: Arc<dyn Material>) -> Self {
+        Self {
+            y0,
+            y1,
+            z0,
+            z1,
+            k,
+            material,
+        }
+    }
+}
+
 impl Hittable for XYRect {
     fn hit(
         &self,
@@ -110,7 +136,7 @@ impl Hittable for XZRect {
             v: (z - self.z0) / (self.z1 - self.z0),
             front_face: false,
         };
-        rec.set_face_normal(r, &Vec3::new(0.0, 0.0, 1.0));
+        rec.set_face_normal(r, &Vec3::new(0.0, 1.0, 0.0));
         Some(rec)
     }
 
@@ -129,7 +155,7 @@ impl Hittable for YZRect {
         t_min: f64,
         t_max: f64,
     ) -> Option<crate::hittable::HitRecord> {
-        let t = (self.k - r.origin().y) / r.direction().y;
+        let t = (self.k - r.origin().x) / r.direction().x;
         if t < t_min || t_max < t {
             return None;
         }
@@ -147,7 +173,7 @@ impl Hittable for YZRect {
             v: (z - self.z0) / (self.z1 - self.z0),
             front_face: false,
         };
-        rec.set_face_normal(r, &Vec3::new(0.0, 0.0, 1.0));
+        rec.set_face_normal(r, &Vec3::new(1.0, 0.0, 0.0));
         Some(rec)
     }
 

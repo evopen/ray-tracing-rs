@@ -204,6 +204,7 @@ pub fn cornell_box() -> HittableList {
         Point3::new(165.0, 330.0, 165.0),
         white.clone(),
     ));
+    let box1 = Arc::new(RotateY::new(box1, 15.0));
     let box1 = Arc::new(Translate::new(box1, Vec3::new(265.0, 0.0, 295.0)));
     objects.add(box1);
 
@@ -212,6 +213,7 @@ pub fn cornell_box() -> HittableList {
         Point3::new(165.0, 165.0, 165.0),
         white.clone(),
     ));
+    let box2 = Arc::new(RotateY::new(box2, -18.0));
     let box2 = Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0)));
     objects.add(box2);
 

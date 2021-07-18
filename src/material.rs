@@ -131,8 +131,20 @@ impl Material for Dielectric {
     }
 }
 
-struct DiffuseLight {
+pub struct DiffuseLight {
     emit: Arc<dyn Texture>,
+}
+
+impl DiffuseLight {
+    pub fn new(texture: Arc<dyn Texture>) -> Self {
+        Self { emit: texture }
+    }
+
+    pub fn new_with_color(color: Color) -> Self {
+        Self {
+            emit: Arc::new(SolidColor::new(color)),
+        }
+    }
 }
 
 impl Material for DiffuseLight {

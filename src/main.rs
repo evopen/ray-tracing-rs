@@ -74,7 +74,7 @@ fn main() {
         .unwrap();
     let image_width = matches.value_of("width").unwrap().parse().unwrap();
     let image_height = (image_width as f64 / aspect_ratio) as u32;
-    let samples_per_pixel = matches
+    let mut samples_per_pixel = matches
         .value_of("samples per pixel")
         .unwrap()
         .parse()
@@ -119,10 +119,11 @@ fn main() {
             vfov = 20.0;
         }
         5 | _ => {
-            hittable_list = scene::earth();
+            hittable_list = scene::simple_light();
+            samples_per_pixel = 400;
             background = Color::splat(0.0);
-            lookfrom = Point3::new(13.0, 2.0, 3.0);
-            lookat = Point3::splat(0.0);
+            lookfrom = Point3::new(26.0, 3.0, 6.0);
+            lookat = Point3::new(0.0, 2.0, 0.0);
             vfov = 20.0;
         }
     }

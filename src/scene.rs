@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
+use crate::aarect::XYRect;
 use crate::color::Color;
 use crate::hittable_list::HittableList;
+use crate::material::DiffuseLight;
 use crate::moving_sphere::MovingSphere;
 use crate::sphere::Sphere;
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture};
@@ -127,4 +129,32 @@ pub fn earth() -> HittableList {
     let mut list = HittableList::new();
     list.add(globe);
     list
+}
+
+pub fn simple_light() -> HittableList {
+    let mut objects = HittableList::new();
+
+    let perlin_texture = Arc::new(NoiseTexture::new(4.0));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Arc::new(material::Lambertian::new(perlin_texture.clone())),
+    )));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, 2.0, 0.0),
+        2.0,
+        Arc::new(material::Lambertian::new(perlin_texture.clone())),
+    )));
+
+    let diffuse_light = Arc::new(DiffuseLight::new_with_color(Color::new(4.0, 4.0, 4.0)));
+    objects.add(Arc::new(XYRect::new(
+        3.0,
+        5.0,
+        1.0,
+        3.0,
+        -2.0,
+        diffuse_light,
+    )));
+
+    objects
 }

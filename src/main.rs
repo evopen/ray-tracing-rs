@@ -154,21 +154,21 @@ fn earth() -> HittableList {
     list
 }
 
-fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
+fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
         return Color::splat(0.0);
     }
     if let Some(rec) = world.hit(r, 0.001, std::f64::INFINITY) {
+        let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
         if let Some(scatter) = rec.material.scatter(r, &rec) {
-            return scatter.attenuation * ray_color(&scatter.ray, world, depth - 1);
+            return emitted
+                + scatter.attenuation * ray_color(&scatter.ray, background, world, depth - 1);
         } else {
-            return Color::splat(0.0);
+            return emitted;
         }
+    } else {
+        return background;
     }
-
-    let unit_direction = r.direction().normalize();
-    let t = (unit_direction.y + 1.0) * 0.5;
-    Color::splat(1.0) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
 }
 
 fn main() {
@@ -209,28 +209,40 @@ fn main() {
     let lookat;
     let mut vfov = 40.0;
     let mut aperture = 0.0;
+    let mut background = Color::splat(0.0);
 
     match scene {
         1 => {
             hittable_list = random_scene();
+            background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         2 => {
             hittable_list = two_spheres();
+            background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
         3 => {
             hittable_list = two_perlin_spheres();
+            background = Color::new(0.7, 0.8, 1.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
-        4 | _ => {
+        4 => {
             hittable_list = earth();
+            background = Color::new(0.7, 0.8, 1.0);
+            lookfrom = Point3::new(13.0, 2.0, 3.0);
+            lookat = Point3::splat(0.0);
+            vfov = 20.0;
+        }
+        5 | _ => {
+            hittable_list = earth();
+            background = Color::splat(0.0);
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;
@@ -281,7 +293,7 @@ fn main() {
                     let u = (x as f64 + utils::rand_f64()) / (image_width - 1) as f64;
                     let v = (y as f64 + utils::rand_f64()) / (image_height - 1) as f64;
                     let r = cam.get_ray(u, v);
-                    pixel_color += ray_color(&r, world.as_ref(), max_depth);
+                    pixel_color += ray_color(&r, background, world.as_ref(), max_depth);
                 }
                 tx.send(((x, y), pixel_color)).unwrap();
             });

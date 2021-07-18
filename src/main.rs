@@ -3,6 +3,7 @@
 #![feature(destructuring_assignment)]
 
 mod aabb;
+mod aarect;
 mod bvh;
 mod camera;
 mod cli;

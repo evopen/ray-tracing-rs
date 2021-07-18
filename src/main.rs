@@ -65,15 +65,14 @@ fn main() {
         .unwrap();
 
     // Image
-    let aspect_ratio = matches
+    let mut aspect_ratio = matches
         .value_of("aspect ratio")
         .map(|s| {
             let (a, b) = s.split_once(':').unwrap();
             a.parse::<f64>().unwrap() / b.parse::<f64>().unwrap()
         })
         .unwrap();
-    let image_width = matches.value_of("width").unwrap().parse().unwrap();
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
+    let mut image_width = matches.value_of("width").unwrap().parse().unwrap();
     let mut samples_per_pixel = matches
         .value_of("samples per pixel")
         .unwrap()
@@ -118,7 +117,7 @@ fn main() {
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
-        5 | _ => {
+        5 => {
             hittable_list = scene::simple_light();
             samples_per_pixel = 400;
             background = Color::splat(0.0);
@@ -126,7 +125,18 @@ fn main() {
             lookat = Point3::new(0.0, 2.0, 0.0);
             vfov = 20.0;
         }
+        6 | _ => {
+            hittable_list = scene::cornell_box();
+            aspect_ratio = 1.0;
+            image_width = 600;
+            samples_per_pixel = 400;
+            background = Color::splat(0.0);
+            lookfrom = Point3::new(278.0, 278.0, -800.0);
+            lookat = Point3::new(278.0, 278.0, 0.0);
+            vfov = 40.0;
+        }
     }
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
     let bvh = hittable_list.build_bvh(0.0, 1.0);
 
     let world: Box<dyn Hittable> = match use_bvh {

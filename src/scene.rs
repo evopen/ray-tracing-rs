@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
-use crate::aarect::XYRect;
+use crate::aarect::{XYRect, XZRect, YZRect};
 use crate::color::Color;
 use crate::hittable_list::HittableList;
-use crate::material::DiffuseLight;
+use crate::material::{DiffuseLight, Lambertian};
 use crate::moving_sphere::MovingSphere;
 use crate::sphere::Sphere;
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture};
@@ -154,6 +154,47 @@ pub fn simple_light() -> HittableList {
         3.0,
         -2.0,
         diffuse_light,
+    )));
+
+    objects
+}
+
+pub fn cornell_box() -> HittableList {
+    let mut objects = HittableList::new();
+
+    let red = Arc::new(Lambertian::new_with_color(Color::new(0.65, 0.05, 0.05)));
+    let white = Arc::new(Lambertian::new_with_color(Color::new(0.73, 0.73, 0.73)));
+    let green = Arc::new(Lambertian::new_with_color(Color::new(0.12, 0.45, 0.15)));
+    let light = Arc::new(DiffuseLight::new_with_color(Color::new(15.0, 15.0, 15.0)));
+
+    objects.add(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    objects.add(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    objects.add(Arc::new(XZRect::new(
+        213.0, 343.0, 227.0, 332.0, 554.0, light,
+    )));
+    objects.add(Arc::new(XZRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    objects.add(Arc::new(XZRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+    objects.add(Arc::new(XYRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
     )));
 
     objects

@@ -43,3 +43,25 @@ pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
     fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB>;
 }
+
+struct Translate {
+    hittable: Arc<dyn Hittable>,
+    offset: Vec3,
+}
+
+impl Hittable for Translate {
+    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+        let moved_r = Ray::new(r.origin() - self.offset, r.direction());
+        self.hittable.hit(&moved_r, t_min, t_max).map(|mut rec| {
+            rec.p += self.offset;
+            (rec.front_face, rec.normal) = crate::ray::faceforward(r.direction(), rec.normal);
+            rec
+        })
+    }
+
+    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
+        self.hittable
+            .bounding_box(time_0, time_1)
+            .map(|bb| AABB::new(bb.min() + self.offset, bb.max() + self.offset))
+    }
+}

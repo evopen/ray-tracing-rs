@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use image::GenericImageView;
+
 use crate::color::Color;
 use crate::vec3::Point3;
 
@@ -72,5 +74,34 @@ impl NoiseTexture {
             scale,
             ..Default::default()
         }
+    }
+}
+
+pub struct ImageTexture {
+    data: image::RgbImage,
+}
+
+impl Texture for ImageTexture {
+    fn value(&self, u: f64, v: f64, _p: Point3) -> Color {
+        let u = u.clamp(0.0, 1.0);
+        let v = v.clamp(0.0, 1.0);
+
+        let width = self.data.width();
+        let height = self.data.height();
+
+        let i = (u * width as f64) as u32;
+        let j = (v * height as f64) as u32;
+
+        assert!(i <= width);
+        assert!(j <= height);
+
+        let color = self.data.get_pixel(i, j);
+        let color_scale = 1.0 / 255.0;
+
+        Color::new(
+            color[0] as f64 * color_scale,
+            color[1] as f64 * color_scale,
+            color[2] as f64 * color_scale,
+        )
     }
 }

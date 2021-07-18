@@ -99,7 +99,7 @@ impl Hittable for XYRect {
             v: (y - self.y0) / (self.y1 - self.y0),
             front_face: false,
         };
-        rec.set_face_normal(r, &Vec3::new(0.0, 0.0, 1.0));
+        rec.set_face_normal(r, Vec3::new(0.0, 0.0, 1.0));
         Some(rec)
     }
 
@@ -136,7 +136,7 @@ impl Hittable for XZRect {
             v: (z - self.z0) / (self.z1 - self.z0),
             front_face: false,
         };
-        rec.set_face_normal(r, &Vec3::new(0.0, 1.0, 0.0));
+        rec.set_face_normal(r, Vec3::new(0.0, 1.0, 0.0));
         Some(rec)
     }
 
@@ -173,7 +173,7 @@ impl Hittable for YZRect {
             v: (z - self.z0) / (self.z1 - self.z0),
             front_face: false,
         };
-        rec.set_face_normal(r, &Vec3::new(1.0, 0.0, 0.0));
+        rec.set_face_normal(r, Vec3::new(1.0, 0.0, 0.0));
         Some(rec)
     }
 

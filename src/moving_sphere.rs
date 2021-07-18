@@ -41,7 +41,7 @@ impl Hittable for MovingSphere {
         let outward_normal = (p - center) / self.radius;
 
         let mut rec = HitRecord::new(&p, &outward_normal, t, &self.material);
-        rec.set_face_normal(r, &outward_normal);
+        rec.set_face_normal(r, outward_normal);
 
         return Some(rec);
     }

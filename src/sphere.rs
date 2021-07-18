@@ -53,7 +53,7 @@ impl crate::hittable::Hittable for Sphere {
         let outward_normal = (p - self.center) / self.radius;
 
         let mut rec = HitRecord::new(&p, &outward_normal, t, &self.material);
-        rec.set_face_normal(r, &outward_normal);
+        rec.set_face_normal(r, outward_normal);
         (rec.u, rec.v) = Self::get_uv(rec.normal);
 
         return Some(rec);

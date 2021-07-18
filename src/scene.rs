@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::aarect::{XYRect, XZRect, YZRect};
 use crate::color::Color;
+use crate::hittable::{RotateY, Translate};
 use crate::hittable_list::HittableList;
 use crate::material::{DiffuseLight, Lambertian};
 use crate::moving_sphere::MovingSphere;
@@ -198,16 +199,21 @@ pub fn cornell_box() -> HittableList {
         white.clone(),
     )));
 
-    objects.add(Arc::new(Box::new(
-        Point3::new(130.0, 0.0, 65.0),
-        Point3::new(295.0, 165.0, 230.0),
+    let box1 = Arc::new(Box::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 330.0, 165.0),
         white.clone(),
-    )));
-    objects.add(Arc::new(Box::new(
-        Point3::new(265.0, 0.0, 295.0),
-        Point3::new(430.0, 330.0, 460.0),
+    ));
+    let box1 = Arc::new(Translate::new(box1, Vec3::new(265.0, 0.0, 295.0)));
+    objects.add(box1);
+
+    let box2 = Arc::new(Box::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 165.0, 165.0),
         white.clone(),
-    )));
+    ));
+    let box2 = Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0)));
+    objects.add(box2);
 
     objects
 }

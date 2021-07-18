@@ -44,9 +44,18 @@ pub trait Hittable: Sync + Send {
     fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB>;
 }
 
-struct Translate {
+pub struct Translate {
     hittable: Arc<dyn Hittable>,
     offset: Vec3,
+}
+
+impl Translate {
+    pub fn new(hittable: Arc<dyn Hittable>, translate: Vec3) -> Self {
+        Self {
+            hittable,
+            offset: translate,
+        }
+    }
 }
 
 impl Hittable for Translate {

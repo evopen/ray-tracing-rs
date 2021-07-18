@@ -4,6 +4,7 @@
 
 mod aabb;
 mod aarect;
+mod r#box;
 mod bvh;
 mod camera;
 mod cli;

@@ -21,7 +21,6 @@ mod utils;
 mod vec3;
 
 use std::io::{stdout, Write};
-use std::sync::Arc;
 use std::time::Duration;
 
 use color::Color;
@@ -73,11 +72,7 @@ fn main() {
         })
         .unwrap();
     let mut image_width = matches.value_of("width").unwrap().parse().unwrap();
-    let mut samples_per_pixel = matches
-        .value_of("samples per pixel")
-        .unwrap()
-        .parse()
-        .unwrap();
+    let mut samples_per_pixel = 100;
     let max_depth = 50;
 
     // World
@@ -136,6 +131,14 @@ fn main() {
             vfov = 40.0;
         }
     }
+
+    if let Some(samples) = matches
+        .value_of("samples per pixel")
+        .map(|s| s.parse::<u32>().unwrap())
+    {
+        samples_per_pixel = samples;
+    }
+
     let image_height = (image_width as f64 / aspect_ratio) as u32;
     let bvh = hittable_list.build_bvh(0.0, 1.0);
 

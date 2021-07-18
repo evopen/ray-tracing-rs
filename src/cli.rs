@@ -55,7 +55,6 @@ pub fn build_app() -> App<'static, 'static> {
         .arg(
             Arg::with_name("samples per pixel")
                 .takes_value(true)
-                .default_value("100")
                 .long("samples")
                 .validator(integer_non_zero_validator),
         )

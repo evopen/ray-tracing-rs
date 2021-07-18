@@ -52,3 +52,12 @@ pub fn refract(i: Vec3, n: Vec3, index: f64) -> Vec3 {
     let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;
     return r_out_perp + r_out_parallel;
 }
+
+/// return (is_front_face, forwarding incident ray normal)
+pub fn faceforward(i: Vec3, n: Vec3) -> (bool, Vec3) {
+    if i.dot(n) < 0.0 {
+        return (true, n);
+    } else {
+        return (false, -n);
+    }
+}

@@ -25,7 +25,7 @@ use std::time::Duration;
 use color::Color;
 use ray::Ray;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use texture::{CheckerTexture, NoiseTexture};
+use texture::{CheckerTexture, ImageTexture, NoiseTexture};
 use vec3::{Point3, Vec3};
 
 use camera::Camera;
@@ -144,6 +144,16 @@ fn two_perlin_spheres() -> HittableList {
     objects
 }
 
+fn earth() -> HittableList {
+    let earth_texture = Arc::new(ImageTexture::new("image/earthmap.jpg"));
+    let earth_surface = Arc::new(material::Lambertian::new(earth_texture));
+    let globe = Arc::new(Sphere::new(Point3::default(), 2.0, earth_surface));
+
+    let mut list = HittableList::new();
+    list.add(globe);
+    list
+}
+
 fn ray_color(r: &Ray, world: &dyn Hittable, depth: u32) -> Color {
     if depth <= 0 {
         return Color::splat(0.0);
@@ -213,8 +223,14 @@ fn main() {
             lookat = Point3::splat(0.0);
             vfov = 20.0;
         }
-        3 | _ => {
+        3 => {
             hittable_list = two_perlin_spheres();
+            lookfrom = Point3::new(13.0, 2.0, 3.0);
+            lookat = Point3::splat(0.0);
+            vfov = 20.0;
+        }
+        4 | _ => {
+            hittable_list = earth();
             lookfrom = Point3::new(13.0, 2.0, 3.0);
             lookat = Point3::splat(0.0);
             vfov = 20.0;

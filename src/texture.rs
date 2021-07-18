@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::Arc;
 
 use image::GenericImageView;
@@ -81,10 +82,18 @@ pub struct ImageTexture {
     data: image::RgbImage,
 }
 
+impl ImageTexture {
+    pub fn new(p: impl AsRef<Path>) -> Self {
+        Self {
+            data: image::open(p).unwrap().into_rgb8(),
+        }
+    }
+}
+
 impl Texture for ImageTexture {
     fn value(&self, u: f64, v: f64, _p: Point3) -> Color {
         let u = u.clamp(0.0, 1.0);
-        let v = v.clamp(0.0, 1.0);
+        let v = 1.0 - v.clamp(0.0, 1.0);
 
         let width = self.data.width();
         let height = self.data.height();

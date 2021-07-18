@@ -5,6 +5,7 @@ use crate::hittable::HitRecord;
 use crate::ray::{self, Ray};
 use crate::texture::{SolidColor, Texture};
 use crate::utils::rand_vec3_in_unit_sphere;
+use crate::vec3::Point3;
 use crate::{utils, vec3};
 
 pub struct Scatter {
@@ -14,6 +15,10 @@ pub struct Scatter {
 
 pub trait Material: Sync + Send {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter>;
+
+    fn emitted(&self, u: f64, v: f64, p: Point3) -> Color {
+        return Color::splat(0.0);
+    }
 }
 
 pub struct Lambertian {
@@ -123,5 +128,19 @@ impl Material for Dielectric {
             ray: Ray::new_with_time(rec.p, dir_out, r.time()),
         };
         Some(scatter)
+    }
+}
+
+struct DiffuseLight {
+    emit: Arc<dyn Texture>,
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, _r: &Ray, _rec: &HitRecord) -> Option<Scatter> {
+        return None;
+    }
+
+    fn emitted(&self, u: f64, v: f64, p: Point3) -> Color {
+        return self.emit.value(u, v, p);
     }
 }

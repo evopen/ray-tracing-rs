@@ -58,14 +58,8 @@ fn main() {
         .unwrap();
 
     // Image
-    let mut aspect_ratio = matches
-        .value_of("aspect ratio")
-        .map(|s| {
-            let (a, b) = s.split_once(':').unwrap();
-            a.parse::<f64>().unwrap() / b.parse::<f64>().unwrap()
-        })
-        .unwrap();
-    let mut image_width = matches.value_of("width").unwrap().parse().unwrap();
+    let mut aspect_ratio = 16.0 / 9.0;
+    let mut image_width = 400;
     let mut samples_per_pixel = 100;
     let max_depth = 50;
 
@@ -151,6 +145,15 @@ fn main() {
         .map(|s| s.parse::<u32>().unwrap())
     {
         samples_per_pixel = samples;
+    }
+    if let Some(width) = matches.value_of("width").map(|s| s.parse::<u32>().unwrap()) {
+        image_width = width;
+    }
+    if let Some(ratio) = matches.value_of("aspect ratio").map(|s| {
+        let (a, b) = s.split_once(':').unwrap();
+        a.parse::<f64>().unwrap() / b.parse::<f64>().unwrap()
+    }) {
+        aspect_ratio = ratio;
     }
 
     let image_height = (image_width as f64 / aspect_ratio) as u32;

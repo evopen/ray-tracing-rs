@@ -40,14 +40,12 @@ pub fn build_app() -> App<'static, 'static> {
         )
         .arg(
             Arg::with_name("width")
-                .default_value("400")
                 .takes_value(true)
                 .long("width")
                 .validator(integer_non_zero_validator),
         )
         .arg(
             Arg::with_name("aspect ratio")
-                .default_value("16:9")
                 .takes_value(true)
                 .long("ratio")
                 .validator(aspect_ratio_validator),

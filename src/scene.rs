@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::color::Color;
 use crate::hittable::Box;
+use crate::hittable::ConstantMedium;
 use crate::hittable::HittableList;
 use crate::hittable::MovingSphere;
 use crate::hittable::Sphere;
@@ -167,7 +168,7 @@ pub fn cornell_box() -> HittableList {
     let red = Arc::new(Lambertian::new_with_color(Color::new(0.65, 0.05, 0.05)));
     let white = Arc::new(Lambertian::new_with_color(Color::new(0.73, 0.73, 0.73)));
     let green = Arc::new(Lambertian::new_with_color(Color::new(0.12, 0.45, 0.15)));
-    let light = Arc::new(DiffuseLight::new_with_color(Color::new(15.0, 15.0, 15.0)));
+    let light = Arc::new(DiffuseLight::new_with_color(Color::splat(15.0)));
 
     objects.add(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
     objects.add(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
@@ -215,6 +216,75 @@ pub fn cornell_box() -> HittableList {
     ));
     let box2 = Arc::new(RotateY::new(box2, -18.0));
     let box2 = Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0)));
+    objects.add(box2);
+
+    objects
+}
+
+pub fn cornell_smoke() -> HittableList {
+    let mut objects = HittableList::new();
+
+    let red = Arc::new(Lambertian::new_with_color(Color::new(0.65, 0.05, 0.05)));
+    let white = Arc::new(Lambertian::new_with_color(Color::new(0.73, 0.73, 0.73)));
+    let green = Arc::new(Lambertian::new_with_color(Color::new(0.12, 0.45, 0.15)));
+    let light = Arc::new(DiffuseLight::new_with_color(Color::splat(7.0)));
+
+    objects.add(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green)));
+    objects.add(Arc::new(YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red)));
+    objects.add(Arc::new(XZRect::new(
+        113.0, 443.0, 127.0, 432.0, 554.0, light,
+    )));
+    objects.add(Arc::new(XZRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        0.0,
+        white.clone(),
+    )));
+    objects.add(Arc::new(XZRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+    objects.add(Arc::new(XYRect::new(
+        0.0,
+        555.0,
+        0.0,
+        555.0,
+        555.0,
+        white.clone(),
+    )));
+
+    let box1 = Arc::new(Box::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 330.0, 165.0),
+        white.clone(),
+    ));
+    let box1 = Arc::new(RotateY::new(box1, 15.0));
+    let box1 = Arc::new(Translate::new(box1, Vec3::new(265.0, 0.0, 295.0)));
+    let box1 = Arc::new(ConstantMedium::new_with_color(
+        box1,
+        0.01,
+        Color::splat(0.0),
+    ));
+    objects.add(box1);
+
+    let box2 = Arc::new(Box::new(
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(165.0, 165.0, 165.0),
+        white.clone(),
+    ));
+    let box2 = Arc::new(RotateY::new(box2, -18.0));
+    let box2 = Arc::new(Translate::new(box2, Vec3::new(130.0, 0.0, 65.0)));
+    let box2 = Arc::new(ConstantMedium::new_with_color(
+        box2,
+        0.01,
+        Color::splat(1.0),
+    ));
     objects.add(box2);
 
     objects

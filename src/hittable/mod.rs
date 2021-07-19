@@ -14,6 +14,7 @@ pub use hittable_list::HittableList;
 pub use moving_sphere::MovingSphere;
 pub use r#box::Box;
 pub use sphere::Sphere;
+pub use constant_medium::ConstantMedium;
 
 use std::sync::Arc;
 

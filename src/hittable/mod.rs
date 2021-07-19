@@ -1,6 +1,21 @@
+mod aabb;
+mod aarect;
+mod r#box;
+mod bvh;
+mod hittable_list;
+mod moving_sphere;
+mod sphere;
+
+pub use aabb::AABB;
+pub use aarect::{XYRect, XZRect, YZRect};
+pub use bvh::BVHNode;
+pub use hittable_list::HittableList;
+pub use moving_sphere::MovingSphere;
+pub use r#box::Box;
+pub use sphere::Sphere;
+
 use std::sync::Arc;
 
-use crate::aabb::AABB;
 use crate::material::Material;
 use crate::Point3;
 use crate::Ray;

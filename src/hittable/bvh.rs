@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::sync::Arc;
 
-use crate::aabb::AABB;
+use super::AABB;
 use crate::hittable::Hittable;
 use crate::utils;
 
@@ -104,7 +104,7 @@ impl Hittable for BVHNode {
         }
     }
 
-    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<crate::aabb::AABB> {
+    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<AABB> {
         Some(self.root.clone())
     }
 }

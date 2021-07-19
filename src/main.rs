@@ -2,21 +2,14 @@
 
 #![feature(destructuring_assignment)]
 
-mod aabb;
-mod aarect;
-mod r#box;
-mod bvh;
 mod camera;
 mod cli;
 mod color;
 mod hittable;
-mod hittable_list;
 mod material;
-mod moving_sphere;
 mod perlin;
 mod ray;
 mod scene;
-mod sphere;
 mod texture;
 mod utils;
 mod vec3;

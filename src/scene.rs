@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use crate::aarect::{XYRect, XZRect, YZRect};
 use crate::color::Color;
+use crate::hittable::Box;
+use crate::hittable::HittableList;
+use crate::hittable::MovingSphere;
+use crate::hittable::Sphere;
 use crate::hittable::{RotateY, Translate};
-use crate::hittable_list::HittableList;
+use crate::hittable::{XYRect, XZRect, YZRect};
 use crate::material::{DiffuseLight, Lambertian};
-use crate::moving_sphere::MovingSphere;
-use crate::r#box::Box;
-use crate::sphere::Sphere;
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture};
 use crate::vec3::Point3;
 use crate::Vec3;

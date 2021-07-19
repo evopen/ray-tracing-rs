@@ -1,11 +1,12 @@
 use std::f64::consts::PI;
 use std::sync::Arc;
 
-use crate::aabb::AABB;
 use crate::hittable::HitRecord;
 use crate::material::Material;
 use crate::vec3::Point3;
 use crate::Vec3;
+
+use super::aabb::AABB;
 
 pub struct Sphere {
     pub center: Point3,
@@ -59,7 +60,7 @@ impl crate::hittable::Hittable for Sphere {
         return Some(rec);
     }
 
-    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<crate::aabb::AABB> {
+    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<AABB> {
         Some(AABB::new(
             self.center - Vec3::splat(self.radius),
             self.center + Vec3::splat(self.radius),

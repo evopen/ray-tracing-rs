@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::bvh::BVHNode;
+use super::{BVHNode, AABB};
 use crate::hittable::{HitRecord, Hittable};
 
 pub struct HittableList {
@@ -39,7 +39,7 @@ impl Hittable for HittableList {
         return result;
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<crate::aabb::AABB> {
+    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
         if self.objects.is_empty() {
             return None;
         };

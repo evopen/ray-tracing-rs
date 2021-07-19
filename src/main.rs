@@ -124,13 +124,23 @@ fn main() {
             lookat = Point3::new(278.0, 278.0, 0.0);
             vfov = 40.0;
         }
-        7 | _ => {
+        7 => {
             hittable_list = scene::cornell_smoke();
             aspect_ratio = 1.0;
             image_width = 600;
             samples_per_pixel = 200;
             background = Color::splat(0.0);
             lookfrom = Point3::new(278.0, 278.0, -800.0);
+            lookat = Point3::new(278.0, 278.0, 0.0);
+            vfov = 40.0;
+        }
+        8 | _ => {
+            hittable_list = scene::final_scene();
+            aspect_ratio = 1.0;
+            image_width = 800;
+            samples_per_pixel = 10000;
+            background = Color::splat(0.0);
+            lookfrom = Point3::new(478.0, 278.0, -600.0);
             lookat = Point3::new(278.0, 278.0, 0.0);
             vfov = 40.0;
         }

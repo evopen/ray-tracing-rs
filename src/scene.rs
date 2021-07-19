@@ -8,6 +8,8 @@ use crate::hittable::MovingSphere;
 use crate::hittable::Sphere;
 use crate::hittable::{RotateY, Translate};
 use crate::hittable::{XYRect, XZRect, YZRect};
+use crate::material::Dielectric;
+use crate::material::Metal;
 use crate::material::{DiffuseLight, Lambertian};
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture};
 use crate::vec3::Point3;
@@ -286,6 +288,118 @@ pub fn cornell_smoke() -> HittableList {
         Color::splat(1.0),
     ));
     objects.add(box2);
+
+    objects
+}
+
+pub fn final_scene() -> HittableList {
+    let mut objects = HittableList::new();
+
+    let ground = Arc::new(Lambertian::new_with_color(Color::new(0.48, 0.83, 0.53)));
+    let boxes_per_side = 20;
+    let mut ground_boxes = HittableList::new();
+    for i in 0..boxes_per_side {
+        for j in 0..boxes_per_side {
+            let w = 100.0;
+            let x0 = -1000.0 + i as f64 * w;
+            let y0 = 0.0;
+            let z0 = -1000.0 + j as f64 * w;
+            let x1 = x0 + w;
+            let y1 = utils::rand_f64_range(1.0, 101.0);
+            let z1 = z0 + w;
+
+            ground_boxes.add(Arc::new(Box::new(
+                Point3::new(x0, y0, z0),
+                Point3::new(x1, y1, z1),
+                ground.clone(),
+            )));
+        }
+    }
+    objects.add(Arc::new(ground_boxes.build_bvh(0.0, 1.0)));
+
+    let light = Arc::new(DiffuseLight::new_with_color(Color::splat(7.0)));
+    objects.add(Arc::new(XZRect::new(
+        123.0, 423.0, 147.0, 412.0, 554.0, light,
+    )));
+
+    let moving_sphere_material = Arc::new(Lambertian::new_with_color(Color::new(0.7, 0.3, 0.1)));
+    let center_0 = Point3::new(400.0, 400.0, 200.0);
+    let center_1 = center_0 + Vec3::new(30.0, 0.0, 0.0);
+    objects.add(Arc::new(MovingSphere::new(
+        center_0,
+        center_1,
+        0.0,
+        1.0,
+        50.0,
+        moving_sphere_material,
+    )));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(260.0, 150.0, 45.0),
+        50.0,
+        Arc::new(Dielectric::new(1.5)),
+    )));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(0.0, 150.0, 145.0),
+        50.0,
+        Arc::new(Metal::new(Color::new(0.8, 0.8, 0.9), 1.0)),
+    )));
+
+    // subsurface
+    let boundary = Arc::new(Sphere::new(
+        Point3::new(360.0, 150.0, 145.0),
+        70.0,
+        Arc::new(Dielectric::new(1.5)),
+    ));
+    objects.add(boundary.clone());
+    objects.add(Arc::new(ConstantMedium::new_with_color(
+        boundary,
+        0.2,
+        Color::new(0.2, 0.4, 0.9),
+    )));
+
+    // fog
+    let boundary = Arc::new(Sphere::new(
+        Point3::splat(0.0),
+        5000.0,
+        Arc::new(Dielectric::new(1.5)),
+    ));
+    objects.add(Arc::new(ConstantMedium::new_with_color(
+        boundary,
+        0.0001,
+        Color::splat(1.0),
+    )));
+
+    // earth
+    let earth_mat = Arc::new(Lambertian::new(Arc::new(ImageTexture::new(
+        "image/earthmap.jpg",
+    ))));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(400.0, 200.0, 400.0),
+        100.0,
+        earth_mat,
+    )));
+
+    let perlin = Arc::new(NoiseTexture::new(0.1));
+    objects.add(Arc::new(Sphere::new(
+        Point3::new(220.0, 280.0, 300.0),
+        80.0,
+        Arc::new(Lambertian::new(perlin)),
+    )));
+
+    let mut balls = HittableList::new();
+    let white = Arc::new(Lambertian::new_with_color(Color::splat(0.73)));
+    let num = 1000;
+    for _ in 0..num {
+        balls.add(Arc::new(Sphere::new(
+            utils::rand_vec3_range(0.0, 165.0),
+            10.0,
+            white.clone(),
+        )));
+    }
+    objects.add(Arc::new(Translate::new(
+        Arc::new(RotateY::new(Arc::new(balls.build_bvh(0.0, 1.0)), 15.0)),
+        Vec3::new(-100.0, 270.0, 395.0),
+    )));
 
     objects
 }

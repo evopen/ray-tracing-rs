@@ -29,12 +29,10 @@ fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, max_depth: u32) -
     let mut emitteds = Vec::with_capacity(max_depth as usize + 1);
     let mut attenuations = Vec::with_capacity(max_depth as usize + 1);
     let mut r = r.clone();
+    let mut depth = max_depth;
 
-    for depth in (0..max_depth).rev() {
-        if depth == 0 {
-            emitteds.push(Color::splat(0.0));
-            break;
-        }
+    while depth != 0 {
+        depth -= 1;
         if let Some(rec) = world.hit(&r, 0.001, crate::Float::INFINITY) {
             let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
             emitteds.push(emitted);
@@ -49,6 +47,9 @@ fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, max_depth: u32) -
             emitteds.push(background);
             break;
         }
+    }
+    if depth == 0 {
+        emitteds.push(Color::splat(0.0));
     }
     let last_color = emitteds.pop().unwrap();
     debug_assert_eq!(emitteds.len(), attenuations.len());

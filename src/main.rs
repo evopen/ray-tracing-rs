@@ -25,21 +25,41 @@ use types::{Float, Point3, Vec3};
 use camera::Camera;
 use hittable::Hittable;
 
-fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Color {
-    if depth <= 0 {
-        return Color::splat(0.0);
-    }
-    if let Some(rec) = world.hit(r, 0.001, crate::Float::INFINITY) {
-        let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
-        if let Some(scatter) = rec.material.scatter(r, &rec) {
-            return emitted
-                + scatter.attenuation * ray_color(&scatter.ray, background, world, depth - 1);
-        } else {
-            return emitted;
+fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, max_depth: u32) -> Color {
+    let mut emitteds = Vec::with_capacity(max_depth as usize + 1);
+    let mut attenuations = Vec::with_capacity(max_depth as usize + 1);
+    let mut r = r.clone();
+
+    for depth in (0..max_depth).rev() {
+        if depth == 0 {
+            emitteds.push(Color::splat(0.0));
+            break;
         }
-    } else {
-        return background;
+        if let Some(rec) = world.hit(&r, 0.001, crate::Float::INFINITY) {
+            let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
+            emitteds.push(emitted);
+            if let Some(scatter) = rec.material.scatter(&r, &rec) {
+                attenuations.push(scatter.attenuation);
+                r.clone_from(&scatter.ray);
+                continue;
+            } else {
+                break;
+            }
+        } else {
+            emitteds.push(background);
+            break;
+        }
     }
+    let last_color = emitteds.pop().unwrap();
+    debug_assert_eq!(emitteds.len(), attenuations.len());
+
+    emitteds
+        .into_iter()
+        .zip(attenuations.into_iter())
+        .rev()
+        .fold(last_color, |color, (emitted, attenuation)| {
+            emitted + attenuation * color
+        })
 }
 
 fn main() {

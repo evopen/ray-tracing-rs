@@ -22,3 +22,9 @@ opt-level = 2
 
 [profile.release]
 lto = false
+
+[features]
+default = ["f64"]
+f32 = []
+f64 = []
+f32-simd = []

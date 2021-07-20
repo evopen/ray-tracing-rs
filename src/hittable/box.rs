@@ -4,7 +4,7 @@ use super::HittableList;
 use super::{XYRect, XZRect, YZRect};
 use crate::hittable::Hittable;
 use crate::material::Material;
-use crate::vec3::Point3;
+use crate::types::Point3;
 
 use super::aabb::AABB;
 
@@ -75,13 +75,13 @@ impl Hittable for Box {
     fn hit(
         &self,
         r: &crate::ray::Ray,
-        t_min: f64,
-        t_max: f64,
+        t_min: crate::Float,
+        t_max: crate::Float,
     ) -> Option<crate::hittable::HitRecord> {
         self.sides.hit(r, t_min, t_max)
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
         self.sides.bounding_box(time_0, time_1)
     }
 }

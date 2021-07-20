@@ -13,7 +13,7 @@ pub fn write_color(
     let mut g = color.y;
     let mut b = color.z;
 
-    let scale = 1.0 / samples_per_pixel as f64;
+    let scale = 1.0 / samples_per_pixel as crate::Float;
     r = (scale * r).sqrt();
     g = (scale * g).sqrt();
     b = (scale * b).sqrt();

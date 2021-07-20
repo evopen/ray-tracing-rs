@@ -11,8 +11,8 @@ mod perlin;
 mod ray;
 mod scene;
 mod texture;
+mod types;
 mod utils;
-mod vec3;
 
 use std::io::{stdout, Write};
 use std::time::Duration;
@@ -20,7 +20,7 @@ use std::time::Duration;
 use color::Color;
 use ray::Ray;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use vec3::{Point3, Vec3};
+use types::{Float, Point3, Vec3};
 
 use camera::Camera;
 use hittable::Hittable;
@@ -29,7 +29,7 @@ fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Co
     if depth <= 0 {
         return Color::splat(0.0);
     }
-    if let Some(rec) = world.hit(r, 0.001, std::f64::INFINITY) {
+    if let Some(rec) = world.hit(r, 0.001, crate::Float::INFINITY) {
         let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
         if let Some(scatter) = rec.material.scatter(r, &rec) {
             return emitted
@@ -151,12 +151,12 @@ fn main() {
     }
     if let Some(ratio) = matches.value_of("aspect ratio").map(|s| {
         let (a, b) = s.split_once(':').unwrap();
-        a.parse::<f64>().unwrap() / b.parse::<f64>().unwrap()
+        a.parse::<crate::Float>().unwrap() / b.parse::<crate::Float>().unwrap()
     }) {
         aspect_ratio = ratio;
     }
 
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
+    let image_height = (image_width as crate::Float / aspect_ratio) as u32;
     let bvh = hittable_list.build_bvh(0.0, 1.0);
 
     let world: Box<dyn Hittable> = match use_bvh {
@@ -199,8 +199,10 @@ fn main() {
             .for_each_with(tx.clone(), |tx, (x, y)| {
                 let mut pixel_color = Color::splat(0.0);
                 for _ in 0..samples_per_pixel {
-                    let u = (x as f64 + utils::rand_f64()) / (image_width - 1) as f64;
-                    let v = (y as f64 + utils::rand_f64()) / (image_height - 1) as f64;
+                    let u = (x as crate::Float + utils::gen_float())
+                        / (image_width - 1) as crate::Float;
+                    let v = (y as crate::Float + utils::gen_float())
+                        / (image_height - 1) as crate::Float;
                     let r = cam.get_ray(u, v);
                     pixel_color += ray_color(&r, background, world.as_ref(), max_depth);
                 }
@@ -213,7 +215,7 @@ fn main() {
         let jobs_done = rx.len();
         print!(
             "\rCompleted {:.1}%     ",
-            jobs_done as f64 / (image_width * image_height) as f64 * 100.0
+            jobs_done as crate::Float / (image_width * image_height) as crate::Float * 100.0
         );
         stdout().flush().unwrap();
 

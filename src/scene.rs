@@ -12,7 +12,7 @@ use crate::material::Dielectric;
 use crate::material::Metal;
 use crate::material::{DiffuseLight, Lambertian};
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture};
-use crate::vec3::Point3;
+use crate::types::Point3;
 use crate::Vec3;
 use crate::{material, utils};
 
@@ -32,18 +32,18 @@ pub fn random_scene() -> HittableList {
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = utils::rand_f64();
+            let choose_mat = utils::gen_float();
             let center = Point3::new(
-                a as f64 + 0.9 * utils::rand_f64(),
+                a as crate::Float + 0.9 * utils::gen_float(),
                 0.2,
-                b as f64 + 0.9 * utils::rand_f64(),
+                b as crate::Float + 0.9 * utils::gen_float(),
             );
 
             if choose_mat < 0.7 {
                 // diffuse
                 let albedo = utils::rand_vec3() * utils::rand_vec3();
                 let sphere_material = Arc::new(material::Lambertian::new_with_color(albedo));
-                let center_1 = center + Vec3::new(0.0, utils::rand_f64_range(0.0, 0.5), 0.0);
+                let center_1 = center + Vec3::new(0.0, utils::gen_range(0.0..0.5), 0.0);
                 world.add(Arc::new(MovingSphere::new(
                     center,
                     center_1,
@@ -55,7 +55,7 @@ pub fn random_scene() -> HittableList {
             } else if choose_mat < 0.85 {
                 // metal
                 let albedo = utils::rand_vec3_range(0.5, 1.0);
-                let fuzz = utils::rand_f64_range(0.0, 0.5);
+                let fuzz = utils::gen_range(0.0..0.5);
                 let sphere_material = Arc::new(material::Metal::new(albedo, fuzz));
                 world.add(Arc::new(Sphere::new(center, 0.2, sphere_material)));
             } else {
@@ -301,11 +301,11 @@ pub fn final_scene() -> HittableList {
     for i in 0..boxes_per_side {
         for j in 0..boxes_per_side {
             let w = 100.0;
-            let x0 = -1000.0 + i as f64 * w;
+            let x0 = -1000.0 + i as crate::Float * w;
             let y0 = 0.0;
-            let z0 = -1000.0 + j as f64 * w;
+            let z0 = -1000.0 + j as crate::Float * w;
             let x1 = x0 + w;
-            let y1 = utils::rand_f64_range(1.0, 101.0);
+            let y1 = utils::gen_range(1.0..101.0);
             let z1 = z0 + w;
 
             ground_boxes.add(Arc::new(Box::new(

@@ -1,13 +1,11 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use image::GenericImageView;
-
 use crate::color::Color;
-use crate::vec3::Point3;
+use crate::types::Point3;
 
 pub trait Texture: Sync + Send {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color;
+    fn value(&self, u: crate::Float, v: crate::Float, p: Point3) -> Color;
 }
 
 pub struct SolidColor {
@@ -15,7 +13,7 @@ pub struct SolidColor {
 }
 
 impl Texture for SolidColor {
-    fn value(&self, _u: f64, _v: f64, _p: Point3) -> Color {
+    fn value(&self, _u: crate::Float, _v: crate::Float, _p: Point3) -> Color {
         return self.color;
     }
 }
@@ -25,7 +23,7 @@ impl SolidColor {
         Self { color }
     }
 
-    pub fn new_with_rgb(r: f64, g: f64, b: f64) -> Self {
+    pub fn new_with_rgb(r: crate::Float, g: crate::Float, b: crate::Float) -> Self {
         Self {
             color: Color::new(r, g, b),
         }
@@ -47,7 +45,7 @@ impl CheckerTexture {
 }
 
 impl Texture for CheckerTexture {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn value(&self, u: crate::Float, v: crate::Float, p: Point3) -> Color {
         let sines = (10.0 * p.x).sin() * (10.0 * p.y).sin() * (10.0 * p.z).sin();
         if sines < 0.0 {
             return self.odd.value(u, v, p);
@@ -60,17 +58,17 @@ impl Texture for CheckerTexture {
 #[derive(Default)]
 pub struct NoiseTexture {
     noise: super::perlin::Perlin,
-    scale: f64,
+    scale: crate::Float,
 }
 
 impl Texture for NoiseTexture {
-    fn value(&self, _u: f64, _v: f64, p: Point3) -> Color {
+    fn value(&self, _u: crate::Float, _v: crate::Float, p: Point3) -> Color {
         Color::splat(1.0) * 0.5 * (1.0 + (10.0 * self.noise.turb(p, 7) + self.scale * p.z).sin())
     }
 }
 
 impl NoiseTexture {
-    pub fn new(scale: f64) -> Self {
+    pub fn new(scale: crate::Float) -> Self {
         Self {
             scale,
             ..Default::default()
@@ -91,15 +89,15 @@ impl ImageTexture {
 }
 
 impl Texture for ImageTexture {
-    fn value(&self, u: f64, v: f64, _p: Point3) -> Color {
+    fn value(&self, u: crate::Float, v: crate::Float, _p: Point3) -> Color {
         let u = u.clamp(0.0, 1.0);
         let v = 1.0 - v.clamp(0.0, 1.0);
 
         let width = self.data.width();
         let height = self.data.height();
 
-        let i = (u * width as f64) as u32;
-        let j = (v * height as f64) as u32;
+        let i = (u * width as crate::Float) as u32;
+        let j = (v * height as crate::Float) as u32;
 
         assert!(i <= width);
         assert!(j <= height);
@@ -108,9 +106,9 @@ impl Texture for ImageTexture {
         let color_scale = 1.0 / 255.0;
 
         Color::new(
-            color[0] as f64 * color_scale,
-            color[1] as f64 * color_scale,
-            color[2] as f64 * color_scale,
+            color[0] as crate::Float * color_scale,
+            color[1] as crate::Float * color_scale,
+            color[2] as crate::Float * color_scale,
         )
     }
 }

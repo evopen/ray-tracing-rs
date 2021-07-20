@@ -4,9 +4,9 @@ use crate::color::Color;
 use crate::hittable::HitRecord;
 use crate::ray::{self, Ray};
 use crate::texture::{SolidColor, Texture};
+use crate::types::Point3;
 use crate::utils::rand_vec3_in_unit_sphere;
-use crate::vec3::Point3;
-use crate::{utils, vec3};
+use crate::{types, utils};
 
 pub struct Scatter {
     pub attenuation: Color,
@@ -16,7 +16,7 @@ pub struct Scatter {
 pub trait Material: Sync + Send {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter>;
 
-    fn emitted(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn emitted(&self, u: crate::Float, v: crate::Float, p: Point3) -> Color {
         return Color::splat(0.0);
     }
 }
@@ -28,7 +28,7 @@ pub struct Lambertian {
 impl Material for Lambertian {
     fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<Scatter> {
         let mut scatter_direction = rec.normal + utils::rand_vec3_unit();
-        if vec3::is_near_zero(scatter_direction) {
+        if types::is_near_zero(scatter_direction) {
             scatter_direction = rec.normal;
         }
         Some(Scatter {
@@ -54,11 +54,11 @@ impl Lambertian {
 
 pub struct Metal {
     base_color: Color,
-    fuzz: f64,
+    fuzz: crate::Float,
 }
 
 impl Metal {
-    pub fn new(base_color: Color, fuzz: f64) -> Self {
+    pub fn new(base_color: Color, fuzz: crate::Float) -> Self {
         Self {
             base_color: base_color,
             fuzz: fuzz.clamp(0.0, 1.0),
@@ -87,15 +87,15 @@ impl Material for Metal {
 }
 
 pub struct Dielectric {
-    pub ir: f64, // index of refraction
+    pub ir: crate::Float, // index of refraction
 }
 
 impl Dielectric {
-    pub fn new(ir: f64) -> Self {
+    pub fn new(ir: crate::Float) -> Self {
         Self { ir }
     }
 
-    fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    fn reflectance(cosine: crate::Float, ref_idx: crate::Float) -> crate::Float {
         // Use Schlick's approximation for reflectance.
         let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         r0 = r0 * r0;
@@ -116,7 +116,7 @@ impl Material for Dielectric {
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
 
         let dir_out = if cannot_refract
-            || Self::reflectance(cos_theta, refraction_ratio) > utils::rand_f64()
+            || Self::reflectance(cos_theta, refraction_ratio) > utils::gen_float()
         {
             ray::reflect(unit_direction, rec.normal)
         } else {
@@ -152,7 +152,7 @@ impl Material for DiffuseLight {
         return None;
     }
 
-    fn emitted(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn emitted(&self, u: crate::Float, v: crate::Float, p: Point3) -> Color {
         return self.emit.value(u, v, p);
     }
 }

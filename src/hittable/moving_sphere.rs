@@ -3,21 +3,26 @@ use std::sync::Arc;
 use super::AABB;
 use crate::hittable::HitRecord;
 use crate::material::Material;
-use crate::vec3::Point3;
+use crate::types::Point3;
 use crate::Hittable;
 use crate::Vec3;
 
 pub struct MovingSphere {
     center_0: Point3,
     center_1: Point3,
-    time_0: f64,
-    time_1: f64,
-    radius: f64,
+    time_0: crate::Float,
+    time_1: crate::Float,
+    radius: crate::Float,
     material: Arc<dyn Material>,
 }
 
 impl Hittable for MovingSphere {
-    fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        r: &crate::ray::Ray,
+        t_min: crate::Float,
+        t_max: crate::Float,
+    ) -> Option<HitRecord> {
         let center = self.center(r.time());
 
         let oc = r.origin() - center;
@@ -46,7 +51,7 @@ impl Hittable for MovingSphere {
         return Some(rec);
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
         let box_0 = AABB::new(
             self.center(time_0) - Vec3::splat(self.radius),
             self.center(time_0) + Vec3::splat(self.radius),
@@ -65,9 +70,9 @@ impl MovingSphere {
     pub fn new(
         center_0: Point3,
         center_1: Point3,
-        time_0: f64,
-        time_1: f64,
-        radius: f64,
+        time_0: crate::Float,
+        time_1: crate::Float,
+        radius: crate::Float,
         material: Arc<dyn Material>,
     ) -> Self {
         Self {
@@ -79,7 +84,7 @@ impl MovingSphere {
             material,
         }
     }
-    pub fn center(&self, time: f64) -> Point3 {
+    pub fn center(&self, time: crate::Float) -> Point3 {
         self.center_0
             + ((time - self.time_0) / (self.time_1 - self.time_0)) * (self.center_1 - self.center_0)
     }

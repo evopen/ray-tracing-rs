@@ -10,11 +10,11 @@ mod sphere;
 pub use aabb::AABB;
 pub use aarect::{XYRect, XZRect, YZRect};
 pub use bvh::BVHNode;
+pub use constant_medium::ConstantMedium;
 pub use hittable_list::HittableList;
 pub use moving_sphere::MovingSphere;
 pub use r#box::Box;
 pub use sphere::Sphere;
-pub use constant_medium::ConstantMedium;
 
 use std::sync::Arc;
 
@@ -28,14 +28,14 @@ pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub material: Arc<dyn Material>,
-    pub t: f64,
-    pub u: f64,
-    pub v: f64,
+    pub t: crate::Float,
+    pub u: crate::Float,
+    pub v: crate::Float,
     pub front_face: bool,
 }
 
 impl HitRecord {
-    pub fn new(p: &Point3, normal: &Vec3, t: f64, material: &Arc<dyn Material>) -> Self {
+    pub fn new(p: &Point3, normal: &Vec3, t: crate::Float, material: &Arc<dyn Material>) -> Self {
         Self {
             p: p.clone(),
             normal: normal.clone(),
@@ -57,8 +57,8 @@ impl HitRecord {
 }
 
 pub trait Hittable: Sync + Send {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB>;
+    fn hit(&self, r: &Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord>;
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB>;
 }
 
 pub struct Translate {
@@ -76,7 +76,7 @@ impl Translate {
 }
 
 impl Hittable for Translate {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord> {
         let moved_r = Ray::new(r.origin() - self.offset, r.direction());
         self.hittable.hit(&moved_r, t_min, t_max).map(|mut rec| {
             rec.p += self.offset;
@@ -85,7 +85,7 @@ impl Hittable for Translate {
         })
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
         self.hittable
             .bounding_box(time_0, time_1)
             .map(|bb| AABB::new(bb.min() + self.offset, bb.max() + self.offset))
@@ -94,27 +94,30 @@ impl Hittable for Translate {
 
 pub struct RotateY {
     hittable: Arc<dyn Hittable>,
-    sin_theta: f64,
-    cos_theta: f64,
+    sin_theta: crate::Float,
+    cos_theta: crate::Float,
     bounding_box: Option<AABB>,
 }
 
 impl RotateY {
     /// angle in degrees
-    pub fn new(hittable: Arc<dyn Hittable>, angle: f64) -> Self {
+    pub fn new(hittable: Arc<dyn Hittable>, angle: crate::Float) -> Self {
         let angle = angle.to_radians();
         let sin_theta = angle.sin();
         let cos_theta = angle.cos();
         let bounding_box = hittable.bounding_box(0.0, 1.0).map(|bb| {
-            let mut min = Point3::splat(f64::INFINITY);
-            let mut max = Point3::splat(f64::NEG_INFINITY);
+            let mut min = Point3::splat(crate::Float::INFINITY);
+            let mut max = Point3::splat(crate::Float::NEG_INFINITY);
 
             for i in 0..=1 {
                 for j in 0..=1 {
                     for k in 0..=1 {
-                        let x = i as f64 * bb.max().x + (1 - i) as f64 * bb.min().x;
-                        let y = j as f64 * bb.max().y + (1 - j) as f64 * bb.min().y;
-                        let z = k as f64 * bb.max().z + (1 - k) as f64 * bb.min().z;
+                        let x =
+                            i as crate::Float * bb.max().x + (1 - i) as crate::Float * bb.min().x;
+                        let y =
+                            j as crate::Float * bb.max().y + (1 - j) as crate::Float * bb.min().y;
+                        let z =
+                            k as crate::Float * bb.max().z + (1 - k) as crate::Float * bb.min().z;
 
                         let new_x = cos_theta * x + sin_theta * z;
                         let new_z = -sin_theta * x + cos_theta * z;
@@ -140,7 +143,7 @@ impl RotateY {
 }
 
 impl Hittable for RotateY {
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord> {
         let origin = Point3::new(
             self.cos_theta * r.origin().x - self.sin_theta * r.origin().z,
             r.origin().y,
@@ -166,7 +169,7 @@ impl Hittable for RotateY {
         })
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
         self.bounding_box.clone()
     }
 }

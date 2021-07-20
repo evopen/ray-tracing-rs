@@ -5,7 +5,7 @@ use crate::Vec3;
 pub struct Ray {
     pub orig: Point3,
     pub dir: Vec3,
-    time: f64,
+    time: crate::Float,
 }
 
 impl Ray {
@@ -17,7 +17,7 @@ impl Ray {
         }
     }
 
-    pub fn new_with_time(origin: Point3, direction: Vec3, time: f64) -> Self {
+    pub fn new_with_time(origin: Point3, direction: Vec3, time: crate::Float) -> Self {
         Self {
             orig: origin.to_owned(),
             dir: direction.to_owned(),
@@ -25,7 +25,7 @@ impl Ray {
         }
     }
 
-    pub fn time(&self) -> f64 {
+    pub fn time(&self) -> crate::Float {
         return self.time;
     }
 
@@ -37,7 +37,7 @@ impl Ray {
         self.dir.to_owned()
     }
 
-    pub fn at(&self, t: f64) -> Point3 {
+    pub fn at(&self, t: crate::Float) -> Point3 {
         self.orig + t * self.dir
     }
 }
@@ -46,7 +46,7 @@ pub fn reflect(i: Vec3, n: Vec3) -> Vec3 {
     i - 2.0 * i.dot(n) * n
 }
 
-pub fn refract(i: Vec3, n: Vec3, index: f64) -> Vec3 {
+pub fn refract(i: Vec3, n: Vec3, index: crate::Float) -> Vec3 {
     let cos_theta = -i.dot(n).min(1.0);
     let r_out_perp = index * (i + cos_theta * n);
     let r_out_parallel = -(1.0 - r_out_perp.length_squared()).abs().sqrt() * n;

@@ -10,12 +10,16 @@ use super::{HitRecord, Hittable};
 
 pub struct ConstantMedium {
     boundary: Arc<dyn Hittable>,
-    neg_inv_density: f64,
+    neg_inv_density: crate::Float,
     phase_function: Arc<dyn Material>,
 }
 
 impl ConstantMedium {
-    pub fn new(boundary: Arc<dyn Hittable>, density: f64, texture: Arc<dyn Texture>) -> Self {
+    pub fn new(
+        boundary: Arc<dyn Hittable>,
+        density: crate::Float,
+        texture: Arc<dyn Texture>,
+    ) -> Self {
         Self {
             boundary,
             neg_inv_density: -1.0 / density,
@@ -23,7 +27,11 @@ impl ConstantMedium {
         }
     }
 
-    pub fn new_with_color(boundary: Arc<dyn Hittable>, density: f64, color: Color) -> Self {
+    pub fn new_with_color(
+        boundary: Arc<dyn Hittable>,
+        density: crate::Float,
+        color: Color,
+    ) -> Self {
         Self {
             boundary,
             neg_inv_density: -1.0 / density,
@@ -33,15 +41,27 @@ impl ConstantMedium {
 }
 
 impl Hittable for ConstantMedium {
-    fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<super::HitRecord> {
+    fn hit(
+        &self,
+        r: &crate::ray::Ray,
+        t_min: crate::Float,
+        t_max: crate::Float,
+    ) -> Option<super::HitRecord> {
         // get smallest t hit
-        let mut rec_1 = match self.boundary.hit(r, f64::NEG_INFINITY, f64::INFINITY) {
-            Some(rec) => rec,
-            None => return None,
-        };
+        let mut rec_1 =
+            match self
+                .boundary
+                .hit(r, crate::Float::NEG_INFINITY, crate::Float::INFINITY)
+            {
+                Some(rec) => rec,
+                None => return None,
+            };
 
         // get second hit point, must be convex
-        let mut rec_2 = match self.boundary.hit(r, rec_1.t + 0.0001, f64::INFINITY) {
+        let mut rec_2 = match self
+            .boundary
+            .hit(r, rec_1.t + 0.0001, crate::Float::INFINITY)
+        {
             Some(rec) => rec,
             None => return None,
         };
@@ -67,7 +87,7 @@ impl Hittable for ConstantMedium {
         let distance_inside_boundary = (rec_2.t - rec_1.t) * ray_length;
 
         // random distance from rec_0.t
-        let hit_distance = self.neg_inv_density * utils::rand_f64().ln();
+        let hit_distance = self.neg_inv_density * utils::gen_float().ln();
 
         // ray miss volume
         if hit_distance > distance_inside_boundary {
@@ -89,7 +109,7 @@ impl Hittable for ConstantMedium {
         Some(rec)
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<super::AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<super::AABB> {
         self.boundary.bounding_box(time_0, time_1).clone()
     }
 }

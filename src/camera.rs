@@ -1,7 +1,5 @@
-use core::f64;
-
 use crate::ray::Ray;
-use crate::vec3::Point3;
+use crate::Point3;
 use crate::{utils, Vec3};
 
 pub struct Camera {
@@ -12,9 +10,9 @@ pub struct Camera {
     _front: Vec3,
     right: Vec3,
     up: Vec3,
-    lens_radius: f64,
-    time_0: f64,
-    time_1: f64,
+    lens_radius: crate::Float,
+    time_0: crate::Float,
+    time_1: crate::Float,
 }
 
 impl Camera {
@@ -27,10 +25,10 @@ impl Camera {
         lookfrom: Point3,
         lookat: Point3,
         vup: Vec3,
-        vfov: f64,
-        aspect_ratio: f64,
-        aperture: f64,
-        focus_dist: f64,
+        vfov: crate::Float,
+        aspect_ratio: crate::Float,
+        aperture: crate::Float,
+        focus_dist: crate::Float,
     ) -> Self {
         let theta = vfov.to_radians();
         let h = (theta / 2.0).tan(); // assume focal length is 1.0
@@ -68,12 +66,12 @@ impl Camera {
         lookfrom: Point3,
         lookat: Point3,
         vup: Vec3,
-        vfov: f64,
-        aspect_ratio: f64,
-        aperture: f64,
-        focus_dist: f64,
-        time_0: f64,
-        time_1: f64,
+        vfov: crate::Float,
+        aspect_ratio: crate::Float,
+        aperture: crate::Float,
+        focus_dist: crate::Float,
+        time_0: crate::Float,
+        time_1: crate::Float,
     ) -> Self {
         let mut this = Self::new(
             lookfrom,
@@ -90,13 +88,13 @@ impl Camera {
         this
     }
 
-    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, u: crate::Float, v: crate::Float) -> Ray {
         let rd = self.lens_radius * utils::rand_vec3_in_unit_disk();
         let offset = self.right * rd.x + self.up * rd.y;
-        let time = if (self.time_0 - self.time_1).abs() < f64::EPSILON {
+        let time = if (self.time_0 - self.time_1).abs() < crate::Float::EPSILON {
             0.0
         } else {
-            utils::rand_f64_range(self.time_0, self.time_1)
+            utils::gen_range(self.time_0..self.time_1)
         };
         Ray::new_with_time(
             self.origin + offset,

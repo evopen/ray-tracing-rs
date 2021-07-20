@@ -19,13 +19,13 @@ impl HittableList {
         self.objects.clear();
     }
 
-    pub fn build_bvh(&self, time_0: f64, time_1: f64) -> BVHNode {
+    pub fn build_bvh(&self, time_0: crate::Float, time_1: crate::Float) -> BVHNode {
         BVHNode::new(&self.objects, time_0, time_1)
     }
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &crate::ray::Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
         let mut result = None;
 
@@ -39,7 +39,7 @@ impl Hittable for HittableList {
         return result;
     }
 
-    fn bounding_box(&self, time_0: f64, time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
         if self.objects.is_empty() {
             return None;
         };

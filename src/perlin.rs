@@ -1,7 +1,7 @@
 use std::ops::BitAnd;
 
+use crate::types::Point3;
 use crate::utils;
-use crate::vec3::Point3;
 use crate::Vec3;
 
 const POINT_COUNT: usize = 256;
@@ -50,7 +50,7 @@ impl Perlin {
         }
     }
 
-    pub fn noise(&self, p: Point3) -> f64 {
+    pub fn noise(&self, p: Point3) -> crate::Float {
         let max = (POINT_COUNT - 1) as i64;
 
         let u = p.x - p.x.floor();
@@ -77,7 +77,7 @@ impl Perlin {
         return Self::trilinear_interp(color_v, u, v, w);
     }
 
-    pub fn turb(&self, p: Point3, depth: u32) -> f64 {
+    pub fn turb(&self, p: Point3, depth: u32) -> crate::Float {
         let mut accum = 0.0;
         let mut p = p;
         let mut weight = 1.0;
@@ -91,14 +91,19 @@ impl Perlin {
         return accum.abs();
     }
 
-    fn trilinear_interp(color_v: [[[Vec3; 2]; 2]; 2], u: f64, v: f64, w: f64) -> f64 {
+    fn trilinear_interp(
+        color_v: [[[Vec3; 2]; 2]; 2],
+        u: crate::Float,
+        v: crate::Float,
+        w: crate::Float,
+    ) -> crate::Float {
         let mut accumulate = 0.0;
         for i in 0..2 {
             for j in 0..2 {
                 for k in 0..2 {
-                    let fi = i as f64;
-                    let fj = j as f64;
-                    let fk = k as f64;
+                    let fi = i as crate::Float;
+                    let fj = j as crate::Float;
+                    let fk = k as crate::Float;
 
                     let weight = (fi * u + (1.0 - fi) * (1.0 - u))
                         * (fj * v + (1.0 - fj) * (1.0 - v))

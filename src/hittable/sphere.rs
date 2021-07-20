@@ -1,21 +1,22 @@
-use std::f64::consts::PI;
 use std::sync::Arc;
 
 use crate::hittable::HitRecord;
 use crate::material::Material;
-use crate::vec3::Point3;
+use crate::types::Point3;
 use crate::Vec3;
+
+use crate::types::PI;
 
 use super::aabb::AABB;
 
 pub struct Sphere {
     pub center: Point3,
-    pub radius: f64,
+    pub radius: crate::Float,
     material: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, r: f64, material: Arc<dyn Material>) -> Self {
+    pub fn new(center: Point3, r: crate::Float, material: Arc<dyn Material>) -> Self {
         Self {
             center: center.to_owned(),
             radius: r,
@@ -23,16 +24,21 @@ impl Sphere {
         }
     }
 
-    fn get_uv(p: Point3) -> (f64, f64) {
+    fn get_uv(p: Point3) -> (crate::Float, crate::Float) {
         let theta = (-p.y).acos();
-        let phi = (-p.z).atan2(p.x) + std::f64::consts::PI;
+        let phi = (-p.z).atan2(p.x) + PI;
 
         (phi / (2.0 * PI), theta / PI)
     }
 }
 
 impl crate::hittable::Hittable for Sphere {
-    fn hit(&self, r: &crate::ray::Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        r: &crate::ray::Ray,
+        t_min: crate::Float,
+        t_max: crate::Float,
+    ) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = r.direction().length_squared();
         let half_b = oc.dot(r.direction());
@@ -60,7 +66,7 @@ impl crate::hittable::Hittable for Sphere {
         return Some(rec);
     }
 
-    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
         Some(AABB::new(
             self.center - Vec3::splat(self.radius),
             self.center + Vec3::splat(self.radius),

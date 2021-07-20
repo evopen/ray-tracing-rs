@@ -37,7 +37,7 @@ fn box_z_compare(a: &Arc<dyn Hittable>, b: &Arc<dyn Hittable>) -> Ordering {
 }
 
 impl BVHNode {
-    pub fn new(objects: &[Arc<dyn Hittable>], time_0: f64, time_1: f64) -> Self {
+    pub fn new(objects: &[Arc<dyn Hittable>], time_0: crate::Float, time_1: crate::Float) -> Self {
         let mut objects = objects.to_vec();
         let axis = utils::gen_range(0..=2);
         let comparator = match axis {
@@ -79,8 +79,8 @@ impl Hittable for BVHNode {
     fn hit(
         &self,
         r: &crate::ray::Ray,
-        t_min: f64,
-        t_max: f64,
+        t_min: crate::Float,
+        t_max: crate::Float,
     ) -> Option<crate::hittable::HitRecord> {
         if !self.root.hit(r, t_min, t_max) {
             return None;
@@ -104,7 +104,7 @@ impl Hittable for BVHNode {
         }
     }
 
-    fn bounding_box(&self, _time_0: f64, _time_1: f64) -> Option<AABB> {
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
         Some(self.root.clone())
     }
 }

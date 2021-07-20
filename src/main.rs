@@ -211,7 +211,7 @@ fn main() {
     });
 
     loop {
-        std::thread::sleep(Duration::from_millis(500));
+        std::thread::sleep(Duration::from_millis(50));
         let jobs_done = rx.len();
         print!(
             "\rCompleted {:.1}%     ",
@@ -229,6 +229,9 @@ fn main() {
         color::write_color(&mut image_buffer, x, y, color, samples_per_pixel);
     }
 
-    println!("\nDone, took {} seconds", start_time.elapsed().as_secs());
+    println!(
+        "\nDone, took {:.1} seconds",
+        start_time.elapsed().as_secs_f32()
+    );
     image_buffer.save("result.png").unwrap();
 }

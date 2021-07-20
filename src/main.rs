@@ -48,10 +48,11 @@ fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, max_depth: u32) -
             break;
         }
     }
-    if depth == 0 {
-        emitteds.push(Color::splat(0.0));
-    }
-    let last_color = emitteds.pop().unwrap();
+    let last_color = match depth == 0 {
+        true => Color::splat(0.0),
+        false => emitteds.pop().unwrap(),
+    };
+
     debug_assert_eq!(emitteds.len(), attenuations.len());
 
     emitteds

@@ -5,6 +5,7 @@
 mod camera;
 mod cli;
 mod color;
+mod gpu;
 mod hittable;
 mod material;
 mod perlin;
@@ -157,12 +158,10 @@ fn main() {
     }
 
     let image_height = (image_width as crate::Float / aspect_ratio) as u32;
+
     let bvh = hittable_list.build_bvh(0.0, 1.0);
 
-    let world: Box<dyn Hittable> = match use_bvh {
-        true => Box::new(bvh),
-        false => Box::new(hittable_list),
-    };
+    let world: Box<dyn Hittable>;
 
     // Camera
     let vup = Vec3::new(0.0, 1.0, 0.0);
@@ -178,6 +177,16 @@ fn main() {
         0.0,
         1.0,
     );
+
+    if matches.is_present("gpu") {
+        gpu::gpu(image_width, image_height, &hittable_list, &cam);
+        return;
+    } else {
+        world = match use_bvh {
+            true => Box::new(bvh),
+            false => Box::new(hittable_list),
+        };
+    }
 
     // Render
     let start_time = std::time::Instant::now();

@@ -1,4 +1,14 @@
 [workspace]
 members = [
-    "ray-tracing"
+    "ray-tracing",
+    "shaders/*"
 ]
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 2
+
+[profile.release]
+lto = false

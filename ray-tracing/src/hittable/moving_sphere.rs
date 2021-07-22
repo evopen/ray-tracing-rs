@@ -64,6 +64,10 @@ impl Hittable for MovingSphere {
 
         Some(output_box)
     }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("moving_sphere_intersection")
+    }
 }
 
 impl MovingSphere {

@@ -3,14 +3,14 @@ use crate::Point3;
 use crate::{utils, Vec3};
 
 pub struct Camera {
-    origin: Point3,
-    lower_left_corner: Point3,
-    horizontal: Vec3,
-    vertical: Vec3,
-    _front: Vec3,
-    right: Vec3,
-    up: Vec3,
-    lens_radius: crate::Float,
+    pub origin: Point3,
+    pub lower_left_corner: Point3,
+    pub horizontal: Vec3,
+    pub vertical: Vec3,
+    pub front: Vec3,
+    pub right: Vec3,
+    pub up: Vec3,
+    pub lens_radius: crate::Float,
     time_0: crate::Float,
     time_1: crate::Float,
 }
@@ -53,7 +53,7 @@ impl Camera {
             lower_left_corner,
             horizontal,
             vertical,
-            _front: front,
+            front,
             right,
             up,
             lens_radius,

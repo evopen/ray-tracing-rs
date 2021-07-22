@@ -36,7 +36,14 @@ pub struct YZRect {
 }
 
 impl XYRect {
-    pub fn new(x0: crate::Float, x1: crate::Float, y0: crate::Float, y1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        x0: crate::Float,
+        x1: crate::Float,
+        y0: crate::Float,
+        y1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             x0,
             x1,
@@ -49,7 +56,14 @@ impl XYRect {
 }
 
 impl XZRect {
-    pub fn new(x0: crate::Float, x1: crate::Float, z0: crate::Float, z1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        x0: crate::Float,
+        x1: crate::Float,
+        z0: crate::Float,
+        z1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             x0,
             x1,
@@ -62,7 +76,14 @@ impl XZRect {
 }
 
 impl YZRect {
-    pub fn new(y0: crate::Float, y1: crate::Float, z0: crate::Float, z1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        y0: crate::Float,
+        y1: crate::Float,
+        z0: crate::Float,
+        z1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             y0,
             y1,
@@ -109,6 +130,10 @@ impl Hittable for XYRect {
             Point3::new(self.x1, self.y1, self.k + AABB_EPSILON),
         ))
     }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("x_y_rect_intersection")
+    }
 }
 
 impl Hittable for XZRect {
@@ -146,6 +171,10 @@ impl Hittable for XZRect {
             Point3::new(self.x1, self.k + AABB_EPSILON, self.z1),
         ))
     }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("x_z_rect_intersection")
+    }
 }
 
 impl Hittable for YZRect {
@@ -182,5 +211,9 @@ impl Hittable for YZRect {
             Point3::new(self.k - AABB_EPSILON, self.y0, self.z0),
             Point3::new(self.k + AABB_EPSILON, self.y1, self.z1),
         ))
+    }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("y_z_rect_intersection")
     }
 }

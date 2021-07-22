@@ -65,7 +65,7 @@ fn main() {
     let max_depth = 50;
 
     // World
-    let hittable_list;
+    let mut hittable_list;
     let lookfrom;
     let lookat;
     let mut vfov = 40.0;
@@ -179,7 +179,7 @@ fn main() {
     );
 
     if matches.is_present("gpu") {
-        gpu::gpu(image_width, image_height, &hittable_list, &cam);
+        gpu::gpu(image_width, image_height, &mut hittable_list, &cam);
         return;
     } else {
         world = match use_bvh {

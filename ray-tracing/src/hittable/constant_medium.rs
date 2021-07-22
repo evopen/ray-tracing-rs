@@ -112,4 +112,8 @@ impl Hittable for ConstantMedium {
     fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<super::AABB> {
         self.boundary.bounding_box(time_0, time_1).clone()
     }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("constant_medium_intersection")
+    }
 }

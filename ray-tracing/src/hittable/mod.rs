@@ -59,6 +59,7 @@ impl HitRecord {
 pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord>;
     fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB>;
+    fn intersection_shader_entry_point(&self) -> Option<&str>;
 }
 
 pub struct Translate {
@@ -89,6 +90,10 @@ impl Hittable for Translate {
         self.hittable
             .bounding_box(time_0, time_1)
             .map(|bb| AABB::new(bb.min() + self.offset, bb.max() + self.offset))
+    }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("translate_intersection")
     }
 }
 
@@ -171,5 +176,9 @@ impl Hittable for RotateY {
 
     fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
         self.bounding_box.clone()
+    }
+
+    fn intersection_shader_entry_point(&self) -> Option<&str> {
+        Some("rotate_y_intersection")
     }
 }

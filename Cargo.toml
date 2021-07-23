@@ -1,7 +1,8 @@
 [workspace]
 members = [
     "ray-tracing",
-    "shaders/*"
+    "shaders/*",
+    "the-rest"
 ]
 
 [profile.dev.package."*"]

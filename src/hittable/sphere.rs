@@ -72,8 +72,4 @@ impl crate::hittable::Hittable for Sphere {
             self.center + Vec3::splat(self.radius),
         ))
     }
-
-    fn intersection_shader_entry_point(&self) -> Option<&str> {
-        Some("sphere_intersection")
-    }
 }

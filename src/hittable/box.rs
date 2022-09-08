@@ -84,8 +84,4 @@ impl Hittable for Box {
     fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
         self.sides.bounding_box(time_0, time_1)
     }
-
-    fn intersection_shader_entry_point(&self) -> Option<&str> {
-        Some("box_intersection")
-    }
 }

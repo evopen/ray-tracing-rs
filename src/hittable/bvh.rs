@@ -107,8 +107,4 @@ impl Hittable for BVHNode {
     fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
         Some(self.root.clone())
     }
-
-    fn intersection_shader_entry_point(&self) -> Option<&str> {
-        None
-    }
 }

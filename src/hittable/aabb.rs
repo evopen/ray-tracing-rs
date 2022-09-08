@@ -1,8 +1,7 @@
 use crate::ray::Ray;
 use crate::types::Point3;
 
-#[repr(C)]
-#[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+#[derive(Clone)]
 pub struct AABB {
     minimum: Point3,
     maximum: Point3,

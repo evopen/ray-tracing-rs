@@ -58,10 +58,4 @@ pub fn build_app() -> App<'static, 'static> {
         )
         .arg(Arg::with_name("use bvh").takes_value(false).long("bvh"))
         .arg(Arg::with_name("job").takes_value(true).short("j"))
-        .arg(
-            Arg::with_name("gpu")
-                .takes_value(false)
-                .long("gpu")
-                .conflicts_with_all(&["use bvh", "job"]),
-        )
 }

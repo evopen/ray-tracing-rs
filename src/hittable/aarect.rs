@@ -36,7 +36,14 @@ pub struct YZRect {
 }
 
 impl XYRect {
-    pub fn new(x0: crate::Float, x1: crate::Float, y0: crate::Float, y1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        x0: crate::Float,
+        x1: crate::Float,
+        y0: crate::Float,
+        y1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             x0,
             x1,
@@ -49,7 +56,14 @@ impl XYRect {
 }
 
 impl XZRect {
-    pub fn new(x0: crate::Float, x1: crate::Float, z0: crate::Float, z1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        x0: crate::Float,
+        x1: crate::Float,
+        z0: crate::Float,
+        z1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             x0,
             x1,
@@ -62,7 +76,14 @@ impl XZRect {
 }
 
 impl YZRect {
-    pub fn new(y0: crate::Float, y1: crate::Float, z0: crate::Float, z1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        y0: crate::Float,
+        y1: crate::Float,
+        z0: crate::Float,
+        z1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             y0,
             y1,

@@ -25,7 +25,12 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &crate::ray::Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        r: &crate::ray::Ray,
+        t_min: crate::Float,
+        t_max: crate::Float,
+    ) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
         let mut result = None;
 

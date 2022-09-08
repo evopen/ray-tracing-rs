@@ -1,3 +1,5 @@
 /target
 *.ppm
 *.png
+*.data*
+*.svg

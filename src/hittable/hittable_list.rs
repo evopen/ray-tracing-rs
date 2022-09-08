@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::{BVHNode, AABB};
+use super::{Aabb, BVHNode};
 use crate::hittable::{HitRecord, Hittable};
 
 pub struct HittableList {
@@ -25,7 +25,12 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &crate::ray::Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord> {
+    fn hit(
+        &self,
+        r: &crate::ray::Ray,
+        t_min: crate::Float,
+        t_max: crate::Float,
+    ) -> Option<HitRecord> {
         let mut closest_so_far = t_max;
         let mut result = None;
 
@@ -39,18 +44,13 @@ impl Hittable for HittableList {
         return result;
     }
 
-    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<Aabb> {
         if self.objects.is_empty() {
             return None;
         };
         let mut object_iter = self.objects.iter();
-        let mut bounding_box =
-            if let Some(bb) = object_iter.next().unwrap().bounding_box(time_0, time_1) {
-                bb
-            } else {
-                return None;
-            };
-        while let Some(object) = object_iter.next() {
+        let mut bounding_box = object_iter.next().unwrap().bounding_box(time_0, time_1)?;
+        for object in object_iter {
             if let Some(b) = object.bounding_box(time_0, time_1) {
                 bounding_box = b.surrounding_box(&bounding_box);
             } else {

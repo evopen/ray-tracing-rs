@@ -7,7 +7,7 @@ use crate::Vec3;
 
 use crate::types::PI;
 
-use super::aabb::AABB;
+use super::aabb::Aabb;
 
 pub struct Sphere {
     pub center: Point3,
@@ -66,8 +66,8 @@ impl crate::hittable::Hittable for Sphere {
         return Some(rec);
     }
 
-    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<Aabb> {
+        Some(Aabb::new(
             self.center - Vec3::splat(self.radius),
             self.center + Vec3::splat(self.radius),
         ))

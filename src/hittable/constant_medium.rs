@@ -109,7 +109,7 @@ impl Hittable for ConstantMedium {
         Some(rec)
     }
 
-    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<super::AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<super::Aabb> {
         self.boundary.bounding_box(time_0, time_1).clone()
     }
 }

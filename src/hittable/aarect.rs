@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use super::AABB;
+use super::Aabb;
 use crate::hittable::{HitRecord, Hittable};
 use crate::material::Material;
 use crate::types::Point3;
@@ -36,7 +36,14 @@ pub struct YZRect {
 }
 
 impl XYRect {
-    pub fn new(x0: crate::Float, x1: crate::Float, y0: crate::Float, y1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        x0: crate::Float,
+        x1: crate::Float,
+        y0: crate::Float,
+        y1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             x0,
             x1,
@@ -49,7 +56,14 @@ impl XYRect {
 }
 
 impl XZRect {
-    pub fn new(x0: crate::Float, x1: crate::Float, z0: crate::Float, z1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        x0: crate::Float,
+        x1: crate::Float,
+        z0: crate::Float,
+        z1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             x0,
             x1,
@@ -62,7 +76,14 @@ impl XZRect {
 }
 
 impl YZRect {
-    pub fn new(y0: crate::Float, y1: crate::Float, z0: crate::Float, z1: crate::Float, k: crate::Float, material: Arc<dyn Material>) -> Self {
+    pub fn new(
+        y0: crate::Float,
+        y1: crate::Float,
+        z0: crate::Float,
+        z1: crate::Float,
+        k: crate::Float,
+        material: Arc<dyn Material>,
+    ) -> Self {
         Self {
             y0,
             y1,
@@ -103,8 +124,8 @@ impl Hittable for XYRect {
         Some(rec)
     }
 
-    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<Aabb> {
+        Some(Aabb::new(
             Point3::new(self.x0, self.y0, self.k - AABB_EPSILON),
             Point3::new(self.x1, self.y1, self.k + AABB_EPSILON),
         ))
@@ -140,8 +161,8 @@ impl Hittable for XZRect {
         Some(rec)
     }
 
-    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<Aabb> {
+        Some(Aabb::new(
             Point3::new(self.x0, self.k - AABB_EPSILON, self.z0),
             Point3::new(self.x1, self.k + AABB_EPSILON, self.z1),
         ))
@@ -177,8 +198,8 @@ impl Hittable for YZRect {
         Some(rec)
     }
 
-    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
-        Some(AABB::new(
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<Aabb> {
+        Some(Aabb::new(
             Point3::new(self.k - AABB_EPSILON, self.y0, self.z0),
             Point3::new(self.k + AABB_EPSILON, self.y1, self.z1),
         ))

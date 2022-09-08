@@ -1,7 +1,5 @@
 // based on ray tracing in one weekend 3.2.3
 
-#![feature(destructuring_assignment)]
-
 mod camera;
 mod cli;
 mod color;
@@ -26,7 +24,7 @@ use camera::Camera;
 use hittable::Hittable;
 
 fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Color {
-    if depth <= 0 {
+    if depth == 0 {
         return Color::splat(0.0);
     }
     if let Some(rec) = world.hit(r, 0.001, crate::Float::INFINITY) {

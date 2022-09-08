@@ -51,11 +51,11 @@ fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Co
 fn main() {
     // Parameters
     let matches = cli::build_app().get_matches();
-    let scene = matches.value_of("scene").unwrap().parse::<u32>().unwrap();
+    let scene = matches.get_one::<u32>("scene").unwrap();
     let use_bvh = matches.is_present("use bvh");
     let threads = matches
-        .value_of("job")
-        .map(|j| j.parse::<usize>().unwrap())
+        .get_one::<usize>("job")
+        .copied()
         .unwrap_or_else(num_cpus::get);
 
     rayon::ThreadPoolBuilder::new()
@@ -137,8 +137,8 @@ fn main() {
         8 | _ => {
             hittable_list = scene::final_scene();
             aspect_ratio = 1.0;
-            image_width = 50;
-            samples_per_pixel = 500;
+            image_width = 800;
+            samples_per_pixel = 10000;
             background = Color::splat(0.0);
             lookfrom = Point3::new(478.0, 278.0, -600.0);
             lookat = Point3::new(278.0, 278.0, 0.0);
@@ -146,14 +146,11 @@ fn main() {
         }
     }
 
-    if let Some(samples) = matches
-        .value_of("samples per pixel")
-        .map(|s| s.parse::<u32>().unwrap())
-    {
-        samples_per_pixel = samples;
+    if let Some(samples) = matches.get_one::<u32>("samples per pixel") {
+        samples_per_pixel = *samples;
     }
-    if let Some(width) = matches.value_of("width").map(|s| s.parse::<u32>().unwrap()) {
-        image_width = width;
+    if let Some(width) = matches.get_one::<u32>("width") {
+        image_width = *width;
     }
     if let Some((w, h)) = matches.get_one::<(crate::Float, crate::Float)>("aspect ratio") {
         aspect_ratio = w / h;

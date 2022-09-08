@@ -155,11 +155,8 @@ fn main() {
     if let Some(width) = matches.value_of("width").map(|s| s.parse::<u32>().unwrap()) {
         image_width = width;
     }
-    if let Some(ratio) = matches.value_of("aspect ratio").map(|s| {
-        let (a, b) = s.split_once(':').unwrap();
-        a.parse::<crate::Float>().unwrap() / b.parse::<crate::Float>().unwrap()
-    }) {
-        aspect_ratio = ratio;
+    if let Some((w, h)) = matches.get_one::<(crate::Float, crate::Float)>("aspect ratio") {
+        aspect_ratio = w / h;
     }
 
     let image_height = (image_width as crate::Float / aspect_ratio) as u32;

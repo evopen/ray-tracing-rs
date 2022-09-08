@@ -15,12 +15,8 @@ fn integer_non_zero_validator(s: String) -> Result<(), String> {
 
 fn aspect_ratio_validator(s: String) -> Result<(), String> {
     if let Some((w, h)) = s.split_once(':') {
-        if let Err(e) = integer_non_zero_validator(w.to_string()) {
-            return Err(e);
-        }
-        if let Err(e) = integer_non_zero_validator(h.to_string()) {
-            return Err(e);
-        }
+        integer_non_zero_validator(w.to_string())?;
+        integer_non_zero_validator(h.to_string())?;
         return Ok(());
     } else {
         return Err("wrong format".into());

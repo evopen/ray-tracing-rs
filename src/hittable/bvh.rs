@@ -1,14 +1,14 @@
 use std::cmp::Ordering;
 use std::sync::Arc;
 
-use super::AABB;
+use super::Aabb;
 use crate::hittable::Hittable;
 use crate::utils;
 
 pub struct BVHNode {
     left: Arc<dyn Hittable>,
     right: Arc<dyn Hittable>,
-    root: AABB,
+    root: Aabb,
 }
 
 #[inline(always)]
@@ -104,7 +104,7 @@ impl Hittable for BVHNode {
         }
     }
 
-    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<Aabb> {
         Some(self.root.clone())
     }
 }

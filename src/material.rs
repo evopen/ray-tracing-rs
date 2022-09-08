@@ -60,7 +60,7 @@ pub struct Metal {
 impl Metal {
     pub fn new(base_color: Color, fuzz: crate::Float) -> Self {
         Self {
-            base_color: base_color,
+            base_color,
             fuzz: fuzz.clamp(0.0, 1.0),
         }
     }

@@ -43,7 +43,7 @@ impl Perlin {
         p
     }
 
-    fn permute(p: &mut Vec<usize>) {
+    fn permute(p: &mut [usize]) {
         for i in (1..(POINT_COUNT - 1)).rev() {
             let target = utils::gen_range(0..i);
             (p[i], p[target]) = (p[target], p[i]);

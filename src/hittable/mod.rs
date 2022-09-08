@@ -7,7 +7,7 @@ mod hittable_list;
 mod moving_sphere;
 mod sphere;
 
-pub use aabb::AABB;
+pub use aabb::Aabb;
 pub use aarect::{XYRect, XZRect, YZRect};
 pub use bvh::BVHNode;
 pub use constant_medium::ConstantMedium;
@@ -37,8 +37,8 @@ pub struct HitRecord {
 impl HitRecord {
     pub fn new(p: &Point3, normal: &Vec3, t: crate::Float, material: &Arc<dyn Material>) -> Self {
         Self {
-            p: p.clone(),
-            normal: normal.clone(),
+            p: *p,
+            normal: *normal,
             t,
             front_face: false,
             material: material.clone(),
@@ -58,7 +58,7 @@ impl HitRecord {
 
 pub trait Hittable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: crate::Float, t_max: crate::Float) -> Option<HitRecord>;
-    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB>;
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<Aabb>;
 }
 
 pub struct Translate {
@@ -85,10 +85,10 @@ impl Hittable for Translate {
         })
     }
 
-    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<Aabb> {
         self.hittable
             .bounding_box(time_0, time_1)
-            .map(|bb| AABB::new(bb.min() + self.offset, bb.max() + self.offset))
+            .map(|bb| Aabb::new(bb.min() + self.offset, bb.max() + self.offset))
     }
 }
 
@@ -96,7 +96,7 @@ pub struct RotateY {
     hittable: Arc<dyn Hittable>,
     sin_theta: crate::Float,
     cos_theta: crate::Float,
-    bounding_box: Option<AABB>,
+    bounding_box: Option<Aabb>,
 }
 
 impl RotateY {
@@ -131,7 +131,7 @@ impl RotateY {
                     }
                 }
             }
-            AABB::new(min, max)
+            Aabb::new(min, max)
         });
         Self {
             hittable,
@@ -169,7 +169,7 @@ impl Hittable for RotateY {
         })
     }
 
-    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<AABB> {
+    fn bounding_box(&self, _time_0: crate::Float, _time_1: crate::Float) -> Option<Aabb> {
         self.bounding_box.clone()
     }
 }

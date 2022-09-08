@@ -1,4 +1,12 @@
 // based on ray tracing in one weekend 3.2.3
+#![allow(
+    dead_code,
+    unused,
+    clippy::needless_return,
+    clippy::redundant_clone,
+    clippy::needless_range_loop,
+    clippy::wildcard_in_or_patterns
+)]
 
 mod camera;
 mod cli;
@@ -48,7 +56,7 @@ fn main() {
     let threads = matches
         .value_of("job")
         .map(|j| j.parse::<usize>().unwrap())
-        .unwrap_or(num_cpus::get());
+        .unwrap_or_else(num_cpus::get);
 
     rayon::ThreadPoolBuilder::new()
         .num_threads(threads)
@@ -129,8 +137,8 @@ fn main() {
         8 | _ => {
             hittable_list = scene::final_scene();
             aspect_ratio = 1.0;
-            image_width = 800;
-            samples_per_pixel = 10000;
+            image_width = 50;
+            samples_per_pixel = 500;
             background = Color::splat(0.0);
             lookfrom = Point3::new(478.0, 278.0, -600.0);
             lookat = Point3::new(278.0, 278.0, 0.0);

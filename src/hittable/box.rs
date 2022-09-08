@@ -6,7 +6,7 @@ use crate::hittable::Hittable;
 use crate::material::Material;
 use crate::types::Point3;
 
-use super::aabb::AABB;
+use super::aabb::Aabb;
 
 pub struct Box {
     p0: Point3,
@@ -81,7 +81,7 @@ impl Hittable for Box {
         self.sides.hit(r, t_min, t_max)
     }
 
-    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<AABB> {
+    fn bounding_box(&self, time_0: crate::Float, time_1: crate::Float) -> Option<Aabb> {
         self.sides.bounding_box(time_0, time_1)
     }
 }

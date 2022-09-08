@@ -2,12 +2,12 @@ use crate::ray::Ray;
 use crate::types::Point3;
 
 #[derive(Clone)]
-pub struct AABB {
+pub struct Aabb {
     minimum: Point3,
     maximum: Point3,
 }
 
-impl AABB {
+impl Aabb {
     pub fn new(a: Point3, b: Point3) -> Self {
         Self {
             minimum: a,
@@ -42,7 +42,7 @@ impl AABB {
         true
     }
 
-    pub fn surrounding_box(&self, other: &AABB) -> AABB {
+    pub fn surrounding_box(&self, other: &Aabb) -> Aabb {
         let small = Point3::new(
             self.min().x.min(other.min().x),
             self.min().y.min(other.min().y),
@@ -55,6 +55,6 @@ impl AABB {
             self.max().z.max(other.max().z),
         );
 
-        AABB::new(small, big)
+        Aabb::new(small, big)
     }
 }

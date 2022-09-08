@@ -69,6 +69,7 @@ pub fn build_app() -> App<'static> {
         .arg(
             Arg::with_name("scene")
                 .default_value("0")
+                .value_parser(clap::builder::RangedU64ValueParser::<u32>::new().range(0..=8))
                 .takes_value(true)
                 .long("scene"),
         )
@@ -91,5 +92,10 @@ pub fn build_app() -> App<'static> {
                 .value_parser(clap::builder::RangedU64ValueParser::<u32>::new().range(1..=100000)),
         )
         .arg(Arg::with_name("use bvh").takes_value(false).long("bvh"))
-        .arg(Arg::with_name("job").takes_value(true).short('j'))
+        .arg(
+            Arg::with_name("job")
+                .takes_value(true)
+                .short('j')
+                .value_parser(clap::value_parser!(u16).range(1..)),
+        )
 }

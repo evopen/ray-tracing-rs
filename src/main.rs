@@ -14,15 +14,17 @@ mod color;
 mod hittable;
 mod material;
 mod perlin;
+mod prelude;
 mod ray;
 mod scene;
 mod texture;
 mod types;
 mod utils;
 
-use std::io::{stdout, Write};
+use std::io::{self, stdout, Write};
 use std::time::Duration;
 
+use crate::prelude::*;
 use color::Color;
 use ray::Ray;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -31,6 +33,7 @@ use types::{Float, Point3, Vec3};
 use camera::Camera;
 use hittable::Hittable;
 
+#[instrument(level = "trace", skip(r, background, world))]
 fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Color {
     if depth == 0 {
         return Color::splat(0.0);
@@ -48,18 +51,42 @@ fn ray_color(r: &Ray, background: Color, world: &dyn Hittable, depth: u32) -> Co
     }
 }
 
+fn install_logger() {
+    use tracing_subscriber::filter::{Directive, LevelFilter};
+    use tracing_subscriber::fmt::format::FmtSpan;
+    use tracing_subscriber::prelude::*;
+    use tracing_subscriber::EnvFilter;
+    let filter = match std::env::var("RUST_LOG") {
+        Ok(env) => EnvFilter::new(env),
+        _ => EnvFilter::default().add_directive(Directive::from(LevelFilter::INFO)),
+    };
+
+    let fmt_layer = tracing_subscriber::fmt::layer()
+        .with_writer(io::stdout)
+        .with_thread_ids(true)
+        .with_thread_names(true)
+        .without_time();
+
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(fmt_layer)
+        .init();
+}
+
 fn main() {
+    install_logger();
     // Parameters
     let matches = cli::build_app().get_matches();
     let scene = matches.get_one::<u32>("scene").unwrap();
     let use_bvh = matches.is_present("use bvh");
     let threads = matches
-        .get_one::<usize>("job")
+        .get_one::<u32>("job")
         .copied()
-        .unwrap_or_else(num_cpus::get);
+        .unwrap_or_else(|| num_cpus::get() as u32);
 
     rayon::ThreadPoolBuilder::new()
-        .num_threads(threads)
+        .num_threads(threads as usize)
+        .thread_name(|i| format!("ry_{}", i))
         .build_global()
         .unwrap();
 
@@ -187,7 +214,7 @@ fn main() {
     let (tx, rx) = crossbeam::channel::bounded((image_width * image_height) as usize);
 
     let worker_thread = std::thread::spawn(move || {
-        println!("job started");
+        info!("job started");
         let mut job_indices = Vec::with_capacity((image_width * image_height) as usize);
         for x in 0..image_width {
             for y in 0..image_height {
@@ -197,6 +224,7 @@ fn main() {
         job_indices
             .into_par_iter()
             .for_each_with(tx.clone(), |tx, (x, y)| {
+                let _ = debug_span!("render_pixel", ?x, ?y);
                 let mut pixel_color = Color::splat(0.0);
                 for _ in 0..samples_per_pixel {
                     let u = (x as crate::Float + utils::gen_float())
@@ -209,22 +237,23 @@ fn main() {
                 tx.send(((x, y), pixel_color)).unwrap();
             });
     });
+    {
+        let _span = info_span!("wait_render").entered();
+        let total_work = (image_width * image_height) as crate::Float;
+        loop {
+            std::thread::sleep(Duration::from_millis(500));
+            let jobs_done = rx.len();
+            info!(
+                "Completed {:.1}%",
+                jobs_done as crate::Float / total_work * 100.0
+            );
 
-    loop {
-        std::thread::sleep(Duration::from_millis(50));
-        let jobs_done = rx.len();
-        print!(
-            "\rCompleted {:.1}%     ",
-            jobs_done as crate::Float / (image_width * image_height) as crate::Float * 100.0
-        );
-        stdout().flush().unwrap();
-
-        if rx.is_full() {
-            worker_thread.join().unwrap();
-            break;
+            if rx.is_full() {
+                worker_thread.join().unwrap();
+                break;
+            }
         }
     }
-
     while let Ok(((x, y), color)) = rx.recv() {
         color::write_color(&mut image_buffer, x, y, color, samples_per_pixel);
     }

@@ -96,6 +96,6 @@ pub fn build_app() -> App<'static> {
             Arg::with_name("job")
                 .takes_value(true)
                 .short('j')
-                .value_parser(clap::value_parser!(u16).range(1..)),
+                .value_parser(clap::value_parser!(u32).range(1..)),
         )
 }

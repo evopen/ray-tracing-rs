@@ -78,7 +78,7 @@ fn main() {
     // Parameters
     let matches = cli::build_app().get_matches();
     let scene = matches.get_one::<u32>("scene").unwrap();
-    let use_bvh = matches.is_present("use bvh");
+    let use_bvh = matches.get_flag("use bvh");
     let threads = matches
         .get_one::<u32>("job")
         .copied()

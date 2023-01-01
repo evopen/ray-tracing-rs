@@ -9,7 +9,7 @@ edition = "2018"
 image = { version = "0.24", default-features = false, features = ["png", "jpeg"] }
 glam = "0.22"
 rand = { version = "0.8", features = ["small_rng"] }
-rayon = "1.5.3"
+rayon = "1.6.1"
 crossbeam = "0.8.2"
 clap = "4.0"
 num_cpus = "1.13.1"

@@ -11,7 +11,7 @@ glam = "0.22"
 rand = { version = "0.8", features = ["small_rng"] }
 rayon = "1.5.3"
 crossbeam = "0.8.2"
-clap = "4.0"
+clap = "4.1"
 num_cpus = "1.13.1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

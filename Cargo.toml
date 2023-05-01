@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 image = { version = "0.24", default-features = false, features = ["png", "jpeg"] }
-glam = "0.22"
+glam = "0.24"
 rand = { version = "0.8", features = ["small_rng"] }
 rayon = "1.5.3"
 crossbeam = "0.8.2"
